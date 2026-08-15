@@ -97,6 +97,30 @@ approval-gated writer
 
 Every run should emit a `run-manifest` with the contract version and content digest so a result can be reproduced and audited.
 
+### Pricing-page reasoning harness
+
+`scripts/pricing-page-agent-harness.ts` is the executable boundary used by the
+pricing assessment Play. It accepts an HTTP(S) URI or inline Markdown, captures
+URI evidence with a full Rote Browser snapshot, asks one selected local agent
+(`codex`, `claude`, `pi`, or `hermes`) to normalize the evidence, and rejects
+output that fails the `pricing-page-snapshot` schema or evidence-reference
+checks.
+
+Published Plays should invoke a commit-pinned raw GitHub URL with `rote deno`
+from a `process.exec` step. A typed Crucible `sales_and_commercial` /
+`pricing-packaging` step must run first. The harness reads that exact response
+from the current DAG workspace, keeping the licensed guidance out of argv,
+diagnostics, and the final result.
+
+```text
+auth_crucible
+  -> load_pricing_rubric
+  -> process.exec: rote deno run --allow-all <pinned-harness-url> --source $source --agent $reasoning_agent
+```
+
+The optional `--rubric` argument exists only for isolated harness development.
+Do not use it in a published Play because process diagnostics can expose argv.
+
 ## Contribution rules
 
 1. Change or add a schema.
