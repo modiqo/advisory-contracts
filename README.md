@@ -121,6 +121,27 @@ auth_crucible
 The optional `--rubric` argument exists only for isolated harness development.
 Do not use it in a published Play because process diagnostics can expose argv.
 
+### Landing-page reasoning harness
+
+`scripts/landing-page-agent-harness.ts` applies the same boundary to landing
+pages. It accepts an HTTP(S) URI or inline Markdown, captures the complete
+rendered Rote Browser snapshot for URI inputs, and asks the selected local
+agent to produce both a `landing-page-snapshot` and a detailed messaging
+decision memo. The harness validates the schema, checks every evidence
+reference (including ranked recommendations), and permits one constrained
+repair attempt before failing nonzero.
+
+Published Plays should invoke a commit-pinned raw GitHub URL after a typed
+Crucible `marketing_and_growth` / `messaging-positioning` step. The harness
+loads that exact response from the current DAG workspace, so licensed guidance
+does not travel in argv or appear in the final result.
+
+```text
+auth_crucible
+  -> load_messaging_rubric
+  -> process.exec: rote deno run --allow-all <pinned-harness-url> --source $source --agent $reasoning_agent
+```
+
 ## Contribution rules
 
 1. Change or add a schema.
