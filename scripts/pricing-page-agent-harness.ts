@@ -294,29 +294,42 @@ async function loadRubricFromWorkspace(): Promise<string> {
     typeof candidate.params === "string" &&
     isPricingRubricCall(candidate.params)
   );
-  if (!row?.response_ids) {
-    throw new Error(
-      "pricing-packaging guidance was not found in the current DAG workspace; run the typed load_pricing_rubric step first",
-    );
+  const candidateIds = row?.response_ids
+    ? JSON.parse(row.response_ids) as number[]
+    : await recentResponseIds();
+  for (const responseId of [...candidateIds].reverse()) {
+    if (!Number.isInteger(responseId)) continue;
+    const queried = await runCommand([
+      "rote",
+      "query",
+      `@${responseId}`,
+      "(.content[0].text // .result.content[0].text)",
+      "-r",
+    ], { cwd: Deno.cwd(), timeoutMs: 30_000 });
+    const text = queried.stdout.trim();
+    if (
+      queried.code === 0 &&
+      /^---\s*\nname:\s*pricing-packaging\b/m.test(text) &&
+      text.includes("Heavybit")
+    ) return queried.stdout;
   }
-  const ids = JSON.parse(row.response_ids) as number[];
-  const responseId = ids.at(-1);
-  if (!Number.isInteger(responseId)) {
-    throw new Error("the pricing-packaging step did not record a response id");
-  }
-  const queried = await runCommand([
+  throw new Error(
+    "pricing-packaging guidance was not found in the current DAG workspace; run the typed load_pricing_rubric step first",
+  );
+}
+
+async function recentResponseIds(): Promise<number[]> {
+  const listed = await runCommand([
     "rote",
-    "query",
-    `@${responseId}`,
-    ".content[0].text",
-    "-r",
+    "ls",
+    "--flat",
+    "--no-thinking",
   ], { cwd: Deno.cwd(), timeoutMs: 30_000 });
-  if (queried.code !== 0 || !queried.stdout.trim()) {
-    throw new Error(
-      `the pricing-packaging response did not contain guidance text: ${queried.stderr.trim()}`,
-    );
-  }
-  return queried.stdout;
+  if (listed.code !== 0) return [];
+  const ids = [...listed.stdout.matchAll(/@([0-9]+)\b/g)]
+    .map((match) => Number(match[1]))
+    .filter(Number.isInteger);
+  return [...new Set(ids)].sort((left, right) => left - right).slice(-30);
 }
 
 async function captureUri(source: string): Promise<{
