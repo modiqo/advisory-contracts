@@ -525,15 +525,18 @@ function markdownWithLineNumbers(source: string): string {
 }
 
 function cleanAgentJson(text: string): unknown {
-  const trimmed = text.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
-  const parsed = JSON.parse(trimmed);
+  const parseText = (value: string): unknown => {
+    const trimmed = value.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+    return JSON.parse(trimmed);
+  };
+  const parsed = parseText(text);
   if (parsed && typeof parsed === "object" && "structured_output" in parsed) {
     const value = (parsed as Record<string, unknown>).structured_output;
     if (value) return value;
   }
   if (parsed && typeof parsed === "object" && typeof (parsed as Record<string, unknown>).result === "string") {
     try {
-      return JSON.parse((parsed as Record<string, string>).result);
+      return parseText((parsed as Record<string, string>).result);
     } catch {
       // Preserve the wrapper so validation reports the useful shape error.
     }
@@ -706,7 +709,6 @@ END_PAGE_EVIDENCE`;
 }
 
 async function invokeAgent(agent: ReasoningAgent, prompt: string): Promise<string> {
-  const schemaText = JSON.stringify(AGENT_ENVELOPE_SCHEMA);
   let argv: string[];
   let stdin: string | undefined = prompt;
   switch (agent) {
@@ -731,12 +733,14 @@ async function invokeAgent(agent: ReasoningAgent, prompt: string): Promise<strin
         "--print",
         "--no-session-persistence",
         "--safe-mode",
+        "--model",
+        "sonnet",
+        "--effort",
+        "medium",
         "--tools",
         "",
         "--output-format",
         "json",
-        "--json-schema",
-        schemaText,
       ];
       break;
     case "pi":
