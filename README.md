@@ -8,6 +8,9 @@ The JSON Schemas are canonical. TypeScript types and runtime validation are conv
 
 - `decision-context`: the decision, actor, trigger, stakes, deadline, and constraints
 - `source-spec`: capability-based input requirements and graceful-degradation rules
+- `content-source`: a safe discriminated input containing either an HTTP(S) URI or inline Markdown
+- `landing-page-snapshot`: normalized landing-page messaging, sections, CTAs, proof, metadata, and exact evidence references
+- `pricing-page-snapshot`: normalized plans, packaging, value metric, CTAs, trust signals, ambiguities, and exact evidence references
 - `evidence-item` and `evidence-bundle`: provenance-preserving normalized evidence
 - `advisory-rubric`: remixable expert guidance, including Crucible/Heavybit skills
 - `decision`: recommendation, counter-evidence, unknowns, thresholds, and kill criteria
@@ -17,7 +20,7 @@ The JSON Schemas are canonical. TypeScript types and runtime validation are conv
 
 ## Use directly
 
-Until the npm package is published, pin a GitHub release or commit and consume `schemas/v1/*.schema.json` directly. Validate at every module boundary. Contract version `0.1.0` carries schema family `v1`; additive changes stay in `v1`, while breaking changes create `v2`.
+Until the npm package is published, pin a GitHub release or commit and consume `schemas/v1/*.schema.json` directly. Validate at every module boundary. Contract version `0.2.0` carries schema family `v1`; additive changes stay in `v1`, while breaking changes create `v2`.
 
 ```ts
 import { ContractValidator } from "@modiqo/advisory-contracts";
@@ -25,6 +28,50 @@ import { ContractValidator } from "@modiqo/advisory-contracts";
 const contracts = new ContractValidator();
 contracts.assert("evidence-bundle", candidate);
 ```
+
+Convert a Play's single `source` string into the canonical input shape without guessing between two populated fields:
+
+```ts
+import { parseContentSourceInput } from "@modiqo/advisory-contracts";
+
+const livePage = parseContentSourceInput("landing-page", "https://modiqo.ai/");
+// { schema_version: "v1", source_id: "landing-page", kind: "uri", uri: "https://modiqo.ai/" }
+
+const draft = parseContentSourceInput("pricing-draft", "# Pricing\n\n## Pro — $99/month");
+// { schema_version: "v1", source_id: "pricing-draft", kind: "markdown", markdown: "..." }
+```
+
+Detection is deterministic and fails closed:
+
+- Valid `http://` and `https://` inputs become `kind: "uri"`.
+- Any other non-empty text becomes `kind: "markdown"`.
+- URI-like inputs using `file:`, `javascript:`, or another unsupported scheme are rejected rather than treated as Markdown.
+- A structured `ContentSource` cannot contain both `uri` and `markdown`.
+
+## Landing and pricing ingestion
+
+The public Play surface can remain a single required string:
+
+```text
+source=https://modiqo.ai/
+```
+
+or inline Markdown:
+
+```text
+source=# Headline
+
+Product description and proposed CTA.
+```
+
+The acquisition stage must normalize that source before any advisory model evaluates it:
+
+| Input | Required acquisition | Snapshot requirement |
+| --- | --- | --- |
+| HTTP(S) URI | Render and inspect with `rote browse` | `method: "rote-browse"`, `rendered: true`, and `final_uri` |
+| Markdown | Parse the supplied text without browsing | `method: "markdown-parser"` and `rendered: false` |
+
+Every normalized claim points to an entry in the snapshot's `evidence` array. Validation rejects duplicate evidence IDs, dangling `evidence_refs`, duplicate pricing plan IDs, and CTAs that reference a missing plan. This lets assessors explain exactly which browser element or Markdown line range supports each conclusion.
 
 ```bash
 npm install
@@ -60,4 +107,4 @@ Every run should emit a `run-manifest` with the contract version and content dig
 
 ## Status
 
-This repository begins at `0.1.0`: suitable for experimentation and Play authoring, but not yet promised as a stable 1.0 API.
+This repository is at `0.2.0`: suitable for experimentation and Play authoring, but not yet promised as a stable 1.0 API.

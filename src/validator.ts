@@ -17,6 +17,83 @@ export interface ValidationResult {
   errors: ErrorObject[];
 }
 
+function semanticError(instancePath: string, message: string, params: Record<string, unknown> = {}): ErrorObject {
+  return {
+    keyword: "contractReference",
+    instancePath,
+    schemaPath: "#/contractReference",
+    params,
+    message
+  };
+}
+
+function recordIds(
+  value: Record<string, unknown>,
+  collectionName: string,
+  idName: string,
+  errors: ErrorObject[]
+): Set<string> {
+  const ids = new Set<string>();
+  const collection = value[collectionName];
+  if (!Array.isArray(collection)) return ids;
+  collection.forEach((item, index) => {
+    if (!item || typeof item !== "object") return;
+    const id = (item as Record<string, unknown>)[idName];
+    if (typeof id !== "string") return;
+    if (ids.has(id)) {
+      errors.push(semanticError(`/${collectionName}/${index}/${idName}`, `must be unique; duplicate '${id}'`, { duplicate: id }));
+    }
+    ids.add(id);
+  });
+  return ids;
+}
+
+function checkEvidenceReferences(value: unknown, evidenceIds: Set<string>, path: string, errors: ErrorObject[]): void {
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => checkEvidenceReferences(item, evidenceIds, `${path}/${index}`, errors));
+    return;
+  }
+  if (!value || typeof value !== "object") return;
+  for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
+    const childPath = `${path}/${key}`;
+    if (key === "evidence_refs" && Array.isArray(child)) {
+      child.forEach((reference, index) => {
+        if (typeof reference === "string" && !evidenceIds.has(reference)) {
+          errors.push(semanticError(`${childPath}/${index}`, `references missing evidence_id '${reference}'`, { missing: reference }));
+        }
+      });
+    } else {
+      checkEvidenceReferences(child, evidenceIds, childPath, errors);
+    }
+  }
+}
+
+function validateSnapshotReferences(schemaName: string, value: unknown): ErrorObject[] {
+  if (schemaName !== "landing-page-snapshot" && schemaName !== "pricing-page-snapshot") return [];
+  if (!value || typeof value !== "object" || Array.isArray(value)) return [];
+
+  const record = value as Record<string, unknown>;
+  const errors: ErrorObject[] = [];
+  const evidenceIds = recordIds(record, "evidence", "evidence_id", errors);
+  checkEvidenceReferences(record, evidenceIds, "", errors);
+
+  if (schemaName === "pricing-page-snapshot") {
+    const planIds = recordIds(record, "plans", "plan_id", errors);
+    const callsToAction = record.calls_to_action;
+    if (Array.isArray(callsToAction)) {
+      callsToAction.forEach((item, index) => {
+        if (!item || typeof item !== "object") return;
+        const planId = (item as Record<string, unknown>).plan_id;
+        if (typeof planId === "string" && !planIds.has(planId)) {
+          errors.push(semanticError(`/calls_to_action/${index}/plan_id`, `references missing plan_id '${planId}'`, { missing: planId }));
+        }
+      });
+    }
+  }
+
+  return errors;
+}
+
 function discoverPackageRoot(): string {
   const candidates = [
     fileURLToPath(new URL("../", import.meta.url)),
@@ -45,8 +122,10 @@ export class ContractValidator {
   validate(schemaName: string, value: unknown): ValidationResult {
     const validator = this.validators.get(schemaName);
     if (!validator) throw new Error(`Unknown advisory contract: ${schemaName}`);
-    const valid = validator(value);
-    return { valid: Boolean(valid), errors: validator.errors ? [...validator.errors] : [] };
+    const schemaValid = validator(value);
+    const errors = validator.errors ? [...validator.errors] : [];
+    if (schemaValid) errors.push(...validateSnapshotReferences(schemaName, value));
+    return { valid: Boolean(schemaValid) && errors.length === 0, errors };
   }
 
   assert(schemaName: string, value: unknown): void {

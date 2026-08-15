@@ -1,0 +1,100 @@
+{
+  "schema_version": "v1",
+  "snapshot_id": "landing-modiqo-2026-08-14",
+  "source": {
+    "schema_version": "v1",
+    "source_id": "modiqo-homepage",
+    "kind": "uri",
+    "uri": "https://modiqo.ai/"
+  },
+  "captured_at": "2026-08-14T20:00:00Z",
+  "extraction": {
+    "method": "rote-browse",
+    "rendered": true,
+    "capture_reference": "@12",
+    "final_uri": "https://modiqo.ai/",
+    "warnings": []
+  },
+  "positioning": {
+    "headline": "Turn repeated work into reusable Plays",
+    "subheadline": "Capture a workflow once and run it anywhere.",
+    "audience": "Teams with recurring operational workflows",
+    "category": "Reusable workflow automation",
+    "problem": "Valuable procedures remain trapped in one-off execution.",
+    "promise": "Make a proven procedure portable and repeatable.",
+    "evidence_refs": ["lp-hero"]
+  },
+  "calls_to_action": [
+    {
+      "cta_id": "cta-product",
+      "label": "See how it works",
+      "kind": "primary",
+      "destination": "https://modiqo.ai/product",
+      "evidence_refs": ["lp-cta"]
+    }
+  ],
+  "sections": [
+    {
+      "section_id": "hero",
+      "order": 0,
+      "section_type": "hero",
+      "heading": "Turn repeated work into reusable Plays",
+      "body_markdown": "Capture a workflow once and run it anywhere.",
+      "evidence_refs": ["lp-hero"]
+    },
+    {
+      "section_id": "proof",
+      "order": 1,
+      "section_type": "proof",
+      "heading": "Used by operating teams",
+      "body_markdown": "Teams reuse validated workflows without rebuilding them.",
+      "evidence_refs": ["lp-proof"]
+    }
+  ],
+  "proof": [
+    {
+      "proof_id": "proof-operating-teams",
+      "kind": "customer",
+      "claim": "Used by operating teams",
+      "attribution": null,
+      "evidence_refs": ["lp-proof"]
+    }
+  ],
+  "navigation": [
+    {
+      "label": "Product",
+      "destination": "https://modiqo.ai/product",
+      "evidence_refs": ["lp-nav"]
+    }
+  ],
+  "metadata": {
+    "title": "Modiqo — Reusable Plays",
+    "description": "Capture and reuse proven workflows.",
+    "canonical_uri": "https://modiqo.ai/",
+    "h1": ["Turn repeated work into reusable Plays"],
+    "h2": ["Used by operating teams"]
+  },
+  "evidence": [
+    {
+      "evidence_id": "lp-hero",
+      "locator": { "kind": "browser-ref", "value": "e14" },
+      "excerpt": "Turn repeated work into reusable Plays"
+    },
+    {
+      "evidence_id": "lp-cta",
+      "locator": { "kind": "browser-ref", "value": "e18" },
+      "excerpt": "See how it works"
+    },
+    {
+      "evidence_id": "lp-proof",
+      "locator": { "kind": "browser-ref", "value": "e27" },
+      "excerpt": "Used by operating teams"
+    },
+    {
+      "evidence_id": "lp-nav",
+      "locator": { "kind": "browser-ref", "value": "e4" },
+      "excerpt": "Product"
+    }
+  ],
+  "unknowns": ["No named customer attribution was present in the captured proof section."]
+}

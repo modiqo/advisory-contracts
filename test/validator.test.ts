@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { ContractValidator } from "../src/index.js";
+import { ContractValidator, parseContentSourceInput } from "../src/index.js";
 
 const validator = new ContractValidator();
 
@@ -24,4 +24,66 @@ test("prevents an approval-gated action from claiming execution", () => {
 
 test("reports unknown contract names", () => {
   assert.throws(() => validator.validate("missing", {}), /Unknown advisory contract/);
+});
+
+test("accepts explicit URI and Markdown content sources", () => {
+  const uri = JSON.parse(readFileSync("examples/valid/content-source-uri.json", "utf8"));
+  const markdown = JSON.parse(readFileSync("examples/valid/content-source-markdown.json", "utf8"));
+  assert.equal(validator.validate("content-source", uri).valid, true);
+  assert.equal(validator.validate("content-source", markdown).valid, true);
+});
+
+test("rejects ambiguous and unsafe content sources", () => {
+  const ambiguous = JSON.parse(readFileSync("examples/invalid/content-source-both-uri-and-markdown.json", "utf8"));
+  const unsafe = JSON.parse(readFileSync("examples/invalid/content-source-unsafe-uri.json", "utf8"));
+  assert.equal(validator.validate("content-source", ambiguous).valid, false);
+  assert.equal(validator.validate("content-source", unsafe).valid, false);
+});
+
+test("maps a Play source string deterministically", () => {
+  assert.deepEqual(parseContentSourceInput("live", " HTTPS://modiqo.ai/pricing "), {
+    schema_version: "v1",
+    source_id: "live",
+    kind: "uri",
+    uri: "https://modiqo.ai/pricing"
+  });
+
+  const markdown = "# Pricing\n\nSimple plans for small teams.\n";
+  assert.deepEqual(parseContentSourceInput("draft", markdown), {
+    schema_version: "v1",
+    source_id: "draft",
+    kind: "markdown",
+    markdown
+  });
+});
+
+test("fails closed for empty input and unsupported URI schemes", () => {
+  assert.throws(() => parseContentSourceInput("empty", "   "), /non-empty HTTP\(S\) URI or Markdown/);
+  assert.throws(() => parseContentSourceInput("unsafe", "javascript:alert(1)"), /must use http or https/);
+  assert.throws(() => parseContentSourceInput("file", "file:\/\/\/tmp\/pricing.md"), /must use http or https/);
+});
+
+test("accepts evidence-linked landing and pricing snapshots", () => {
+  const landing = JSON.parse(readFileSync("examples/valid/landing-page-snapshot-uri.json", "utf8"));
+  const pricing = JSON.parse(readFileSync("examples/valid/pricing-page-snapshot-markdown.json", "utf8"));
+  assert.equal(validator.validate("landing-page-snapshot", landing).valid, true);
+  assert.equal(validator.validate("pricing-page-snapshot", pricing).valid, true);
+});
+
+test("rejects dangling evidence and pricing plan references", () => {
+  const landing = JSON.parse(readFileSync("examples/invalid/landing-page-snapshot-missing-evidence.json", "utf8"));
+  const pricing = JSON.parse(readFileSync("examples/invalid/pricing-page-snapshot-missing-plan.json", "utf8"));
+  const landingResult = validator.validate("landing-page-snapshot", landing);
+  const pricingResult = validator.validate("pricing-page-snapshot", pricing);
+  assert.equal(landingResult.valid, false);
+  assert.ok(landingResult.errors.some((error) => error.keyword === "contractReference" && error.instancePath === "/positioning/evidence_refs/0"));
+  assert.equal(pricingResult.valid, false);
+  assert.ok(pricingResult.errors.some((error) => error.keyword === "contractReference" && error.instancePath === "/calls_to_action/0/plan_id"));
+});
+
+test("requires URI snapshots to come from a rendered rote browse capture", () => {
+  const landing = JSON.parse(readFileSync("examples/valid/landing-page-snapshot-uri.json", "utf8"));
+  landing.extraction.method = "markdown-parser";
+  landing.extraction.rendered = false;
+  assert.equal(validator.validate("landing-page-snapshot", landing).valid, false);
 });

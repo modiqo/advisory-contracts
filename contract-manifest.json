@@ -1,9 +1,12 @@
 {
   "name": "@modiqo/advisory-contracts",
-  "contract_version": "0.1.0",
+  "contract_version": "0.2.0",
   "schema_version": "v1",
   "draft": "https://json-schema.org/draft/2020-12/schema",
   "schemas": [
+    { "name": "content-source", "path": "schemas/v1/content-source.schema.json" },
+    { "name": "landing-page-snapshot", "path": "schemas/v1/landing-page-snapshot.schema.json" },
+    { "name": "pricing-page-snapshot", "path": "schemas/v1/pricing-page-snapshot.schema.json" },
     { "name": "decision-context", "path": "schemas/v1/decision-context.schema.json" },
     { "name": "source-spec", "path": "schemas/v1/source-spec.schema.json" },
     { "name": "evidence-item", "path": "schemas/v1/evidence-item.schema.json" },

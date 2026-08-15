@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.modiqo.com/advisory/v1/content-source.schema.json",
+  "title": "Content Source",
+  "description": "A safe, explicit URI-or-Markdown input for page analysis workflows.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source_id", "kind"],
+  "properties": {
+    "schema_version": { "const": "v1" },
+    "source_id": { "type": "string", "minLength": 1 },
+    "kind": { "enum": ["uri", "markdown"] },
+    "uri": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https?://",
+      "description": "An HTTP(S) page URI to render and parse through rote browse."
+    },
+    "markdown": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Inline Markdown content. Plain text is valid Markdown."
+    },
+    "base_uri": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https?://",
+      "description": "Optional HTTP(S) base URI for resolving relative links in Markdown."
+    },
+    "title": { "type": "string", "minLength": 1 },
+    "content_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "extensions": { "type": "object", "additionalProperties": true }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "kind": { "const": "uri" },
+        "uri": { "type": "string", "format": "uri", "pattern": "^https?://" },
+        "markdown": false,
+        "base_uri": false
+      },
+      "required": ["uri"]
+    },
+    {
+      "properties": {
+        "kind": { "const": "markdown" },
+        "markdown": { "type": "string", "minLength": 1 },
+        "uri": false
+      },
+      "required": ["markdown"]
+    }
+  ]
+}

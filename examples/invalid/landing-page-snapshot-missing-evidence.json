@@ -1,0 +1,39 @@
+{
+  "schema_version": "v1",
+  "snapshot_id": "landing-invalid",
+  "source": {
+    "schema_version": "v1",
+    "source_id": "landing-draft",
+    "kind": "markdown",
+    "markdown": "# A clear headline"
+  },
+  "captured_at": "2026-08-14T20:00:00Z",
+  "extraction": {
+    "method": "markdown-parser",
+    "rendered": false,
+    "capture_reference": "input:landing-draft",
+    "warnings": []
+  },
+  "positioning": {
+    "headline": "A clear headline",
+    "subheadline": null,
+    "audience": null,
+    "category": null,
+    "problem": null,
+    "promise": null,
+    "evidence_refs": ["evidence-that-does-not-exist"]
+  },
+  "calls_to_action": [],
+  "sections": [],
+  "proof": [],
+  "navigation": [],
+  "metadata": {
+    "title": null,
+    "description": null,
+    "canonical_uri": null,
+    "h1": ["A clear headline"],
+    "h2": []
+  },
+  "evidence": [],
+  "unknowns": []
+}

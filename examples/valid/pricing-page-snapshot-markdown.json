@@ -1,0 +1,83 @@
+{
+  "schema_version": "v1",
+  "snapshot_id": "pricing-draft-2026-08-14",
+  "source": {
+    "schema_version": "v1",
+    "source_id": "pricing-draft",
+    "kind": "markdown",
+    "markdown": "# Pricing\n\n## Pro — $99/month\nFor small operating teams. Includes 100 Play runs.\n\n[Start a trial](/signup)\n\nAdditional runs are billed separately."
+  },
+  "captured_at": "2026-08-14T20:05:00Z",
+  "extraction": {
+    "method": "markdown-parser",
+    "rendered": false,
+    "capture_reference": "input:pricing-draft",
+    "warnings": ["Responsive layout and browser metadata are unavailable for Markdown input."]
+  },
+  "target_customer": "Small operating teams",
+  "packaging": {
+    "pricing_visibility": "public",
+    "model": "tiered",
+    "value_metric": "Play runs",
+    "free_offer": null,
+    "trial": "A trial is offered; duration is not stated.",
+    "enterprise_motion": null,
+    "feature_differentiation": ["100 Play runs included"],
+    "evidence_refs": ["price-pro", "price-trial"]
+  },
+  "plans": [
+    {
+      "plan_id": "pro",
+      "name": "Pro",
+      "description": "For small operating teams.",
+      "audience": "Small operating teams",
+      "price": {
+        "amount": 99,
+        "currency": "USD",
+        "cadence": "month",
+        "unit": "workspace",
+        "qualifier": null
+      },
+      "features": ["100 Play runs"],
+      "limits": ["Additional runs are billed separately."],
+      "highlighted": false,
+      "evidence_refs": ["price-pro", "price-overage"]
+    }
+  ],
+  "calls_to_action": [
+    {
+      "cta_id": "cta-pro-trial",
+      "label": "Start a trial",
+      "kind": "start-trial",
+      "destination": "/signup",
+      "plan_id": "pro",
+      "evidence_refs": ["price-trial"]
+    }
+  ],
+  "trust_signals": [],
+  "objections_addressed": [],
+  "pricing_ambiguities": [
+    {
+      "statement": "The price of additional Play runs is not stated.",
+      "evidence_refs": ["price-overage"]
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "price-pro",
+      "locator": { "kind": "markdown-line-range", "value": "L3-L4" },
+      "excerpt": "## Pro — $99/month\nFor small operating teams. Includes 100 Play runs."
+    },
+    {
+      "evidence_id": "price-trial",
+      "locator": { "kind": "markdown-line-range", "value": "L6" },
+      "excerpt": "[Start a trial](/signup)"
+    },
+    {
+      "evidence_id": "price-overage",
+      "locator": { "kind": "markdown-line-range", "value": "L8" },
+      "excerpt": "Additional runs are billed separately."
+    }
+  ],
+  "unknowns": ["Trial duration", "Overage price", "Enterprise packaging"]
+}

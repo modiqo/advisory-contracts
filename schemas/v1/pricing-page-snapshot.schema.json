@@ -1,0 +1,225 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.modiqo.com/advisory/v1/pricing-page-snapshot.schema.json",
+  "title": "Pricing Page Snapshot",
+  "description": "A normalized, provenance-preserving representation of a rendered pricing page or Markdown pricing draft.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "snapshot_id", "source", "captured_at", "extraction", "target_customer", "packaging", "plans", "calls_to_action", "trust_signals", "objections_addressed", "pricing_ambiguities", "evidence", "unknowns"],
+  "properties": {
+    "schema_version": { "const": "v1" },
+    "snapshot_id": { "type": "string", "minLength": 1 },
+    "source": { "$ref": "https://schemas.modiqo.com/advisory/v1/content-source.schema.json" },
+    "captured_at": { "type": "string", "format": "date-time" },
+    "extraction": { "$ref": "#/$defs/extraction" },
+    "target_customer": { "$ref": "#/$defs/nullableString" },
+    "packaging": { "$ref": "#/$defs/packaging" },
+    "plans": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/pricingPlan" }
+    },
+    "calls_to_action": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/callToAction" }
+    },
+    "trust_signals": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/trustSignal" }
+    },
+    "objections_addressed": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/evidencedStatement" }
+    },
+    "pricing_ambiguities": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/evidencedStatement" }
+    },
+    "evidence": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/evidenceReference" }
+    },
+    "unknowns": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "extensions": { "type": "object", "additionalProperties": true }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "source": {
+            "type": "object",
+            "properties": { "kind": { "const": "uri" } },
+            "required": ["kind"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "extraction": {
+            "type": "object",
+            "properties": {
+              "method": { "const": "rote-browse" },
+              "rendered": { "const": true },
+              "final_uri": { "type": "string", "format": "uri", "pattern": "^https?://" }
+            },
+            "required": ["final_uri"]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "source": {
+            "type": "object",
+            "properties": { "kind": { "const": "markdown" } },
+            "required": ["kind"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "extraction": {
+            "type": "object",
+            "properties": {
+              "method": { "const": "markdown-parser" },
+              "rendered": { "const": false }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "nullableString": { "type": ["string", "null"] },
+    "evidenceIds": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "extraction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "rendered", "capture_reference", "warnings"],
+      "properties": {
+        "method": { "enum": ["rote-browse", "markdown-parser"] },
+        "rendered": { "type": "boolean" },
+        "capture_reference": { "type": "string", "minLength": 1 },
+        "final_uri": { "type": "string", "format": "uri", "pattern": "^https?://" },
+        "warnings": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "packaging": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pricing_visibility", "model", "value_metric", "free_offer", "trial", "enterprise_motion", "feature_differentiation", "evidence_refs"],
+      "properties": {
+        "pricing_visibility": { "enum": ["public", "partial", "contact-sales", "absent"] },
+        "model": { "enum": ["flat", "per-seat", "usage", "tiered", "hybrid", "custom", "unknown"] },
+        "value_metric": { "$ref": "#/$defs/nullableString" },
+        "free_offer": { "$ref": "#/$defs/nullableString" },
+        "trial": { "$ref": "#/$defs/nullableString" },
+        "enterprise_motion": { "$ref": "#/$defs/nullableString" },
+        "feature_differentiation": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "evidence_refs": { "$ref": "#/$defs/evidenceIds" }
+      }
+    },
+    "price": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["amount", "currency", "cadence", "unit", "qualifier"],
+      "properties": {
+        "amount": { "type": ["number", "null"], "minimum": 0 },
+        "currency": {
+          "oneOf": [
+            { "type": "string", "pattern": "^[A-Z]{3}$" },
+            { "type": "null" }
+          ]
+        },
+        "cadence": { "enum": ["free", "month", "year", "one-time", "usage", "custom"] },
+        "unit": { "$ref": "#/$defs/nullableString" },
+        "qualifier": { "$ref": "#/$defs/nullableString" }
+      }
+    },
+    "pricingPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["plan_id", "name", "description", "audience", "price", "features", "limits", "highlighted", "evidence_refs"],
+      "properties": {
+        "plan_id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "description": { "$ref": "#/$defs/nullableString" },
+        "audience": { "$ref": "#/$defs/nullableString" },
+        "price": { "$ref": "#/$defs/price" },
+        "features": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "limits": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "highlighted": { "type": "boolean" },
+        "evidence_refs": { "$ref": "#/$defs/evidenceIds" }
+      }
+    },
+    "callToAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cta_id", "label", "kind", "destination", "plan_id", "evidence_refs"],
+      "properties": {
+        "cta_id": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 },
+        "kind": { "enum": ["start-free", "start-trial", "buy", "contact-sales", "book-demo", "other"] },
+        "destination": { "$ref": "#/$defs/nullableString" },
+        "plan_id": { "$ref": "#/$defs/nullableString" },
+        "evidence_refs": { "$ref": "#/$defs/evidenceIds" }
+      }
+    },
+    "trustSignal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["signal_id", "kind", "claim", "attribution", "evidence_refs"],
+      "properties": {
+        "signal_id": { "type": "string", "minLength": 1 },
+        "kind": { "enum": ["customer", "testimonial", "metric", "security", "guarantee", "case-study", "other"] },
+        "claim": { "type": "string", "minLength": 1 },
+        "attribution": { "$ref": "#/$defs/nullableString" },
+        "evidence_refs": { "$ref": "#/$defs/evidenceIds" }
+      }
+    },
+    "evidencedStatement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statement", "evidence_refs"],
+      "properties": {
+        "statement": { "type": "string", "minLength": 1 },
+        "evidence_refs": { "$ref": "#/$defs/evidenceIds" }
+      }
+    },
+    "evidenceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_id", "locator", "excerpt"],
+      "properties": {
+        "evidence_id": { "type": "string", "minLength": 1 },
+        "locator": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "enum": ["browser-ref", "css-selector", "markdown-line-range", "uri-fragment", "capture-reference"] },
+            "value": { "type": "string", "minLength": 1 }
+          }
+        },
+        "excerpt": { "type": "string" },
+        "content_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+      }
+    }
+  }
+}

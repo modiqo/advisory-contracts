@@ -1,0 +1,50 @@
+{
+  "schema_version": "v1",
+  "snapshot_id": "pricing-invalid",
+  "source": {
+    "schema_version": "v1",
+    "source_id": "pricing-draft",
+    "kind": "markdown",
+    "markdown": "# Pricing\n\n[Buy now](/buy)"
+  },
+  "captured_at": "2026-08-14T20:00:00Z",
+  "extraction": {
+    "method": "markdown-parser",
+    "rendered": false,
+    "capture_reference": "input:pricing-draft",
+    "warnings": []
+  },
+  "target_customer": null,
+  "packaging": {
+    "pricing_visibility": "absent",
+    "model": "unknown",
+    "value_metric": null,
+    "free_offer": null,
+    "trial": null,
+    "enterprise_motion": null,
+    "feature_differentiation": [],
+    "evidence_refs": ["pricing-cta"]
+  },
+  "plans": [],
+  "calls_to_action": [
+    {
+      "cta_id": "buy",
+      "label": "Buy now",
+      "kind": "buy",
+      "destination": "/buy",
+      "plan_id": "missing-plan",
+      "evidence_refs": ["pricing-cta"]
+    }
+  ],
+  "trust_signals": [],
+  "objections_addressed": [],
+  "pricing_ambiguities": [],
+  "evidence": [
+    {
+      "evidence_id": "pricing-cta",
+      "locator": { "kind": "markdown-line-range", "value": "L3" },
+      "excerpt": "[Buy now](/buy)"
+    }
+  ],
+  "unknowns": ["The referenced pricing plan is missing."]
+}

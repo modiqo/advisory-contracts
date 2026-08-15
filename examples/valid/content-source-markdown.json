@@ -1,0 +1,8 @@
+{
+  "schema_version": "v1",
+  "source_id": "homepage-draft",
+  "kind": "markdown",
+  "title": "Modiqo landing page draft",
+  "base_uri": "https://modiqo.ai/",
+  "markdown": "# Turn repeated work into reusable Plays\n\nCapture a workflow once and run it anywhere.\n\n[See how it works](/product)"
+}

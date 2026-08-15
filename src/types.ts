@@ -2,6 +2,165 @@ export type SchemaVersion = "v1";
 export type Sensitivity = "public" | "internal" | "confidential" | "restricted";
 export type Confidence = "low" | "medium" | "high";
 
+export interface ContentSourceBase {
+  schema_version: SchemaVersion;
+  source_id: string;
+  title?: string;
+  content_hash?: string;
+  extensions?: Record<string, unknown>;
+}
+
+export interface UriContentSource extends ContentSourceBase {
+  kind: "uri";
+  uri: string;
+}
+
+export interface MarkdownContentSource extends ContentSourceBase {
+  kind: "markdown";
+  markdown: string;
+  base_uri?: string;
+}
+
+export type ContentSource = UriContentSource | MarkdownContentSource;
+
+export interface PageExtraction {
+  method: "rote-browse" | "markdown-parser";
+  rendered: boolean;
+  capture_reference: string;
+  final_uri?: string;
+  warnings: string[];
+}
+
+export interface PageEvidenceReference {
+  evidence_id: string;
+  locator: {
+    kind: "browser-ref" | "css-selector" | "markdown-line-range" | "uri-fragment" | "capture-reference";
+    value: string;
+  };
+  excerpt: string;
+  content_hash?: string;
+}
+
+export interface LandingPagePositioning {
+  headline: string | null;
+  subheadline: string | null;
+  audience: string | null;
+  category: string | null;
+  problem: string | null;
+  promise: string | null;
+  evidence_refs: string[];
+}
+
+export interface LandingPageCallToAction {
+  cta_id: string;
+  label: string;
+  kind: "primary" | "secondary" | "navigation" | "form" | "contact" | "purchase" | "other";
+  destination: string | null;
+  evidence_refs: string[];
+}
+
+export interface LandingPageSection {
+  section_id: string;
+  order: number;
+  section_type: "hero" | "problem" | "benefits" | "features" | "proof" | "how-it-works" | "comparison" | "pricing" | "objection" | "faq" | "cta" | "footer" | "other";
+  heading: string | null;
+  body_markdown: string;
+  evidence_refs: string[];
+}
+
+export interface LandingPageProofItem {
+  proof_id: string;
+  kind: "testimonial" | "customer" | "metric" | "case-study" | "certification" | "media" | "other";
+  claim: string;
+  attribution: string | null;
+  evidence_refs: string[];
+}
+
+export interface LandingPageSnapshot {
+  schema_version: SchemaVersion;
+  snapshot_id: string;
+  source: ContentSource;
+  captured_at: string;
+  extraction: PageExtraction;
+  positioning: LandingPagePositioning;
+  calls_to_action: LandingPageCallToAction[];
+  sections: LandingPageSection[];
+  proof: LandingPageProofItem[];
+  navigation: Array<{ label: string; destination: string; evidence_refs: string[] }>;
+  metadata: {
+    title: string | null;
+    description: string | null;
+    canonical_uri: string | null;
+    h1: string[];
+    h2: string[];
+  };
+  evidence: PageEvidenceReference[];
+  unknowns: string[];
+  extensions?: Record<string, unknown>;
+}
+
+export interface PricingPagePackaging {
+  pricing_visibility: "public" | "partial" | "contact-sales" | "absent";
+  model: "flat" | "per-seat" | "usage" | "tiered" | "hybrid" | "custom" | "unknown";
+  value_metric: string | null;
+  free_offer: string | null;
+  trial: string | null;
+  enterprise_motion: string | null;
+  feature_differentiation: string[];
+  evidence_refs: string[];
+}
+
+export interface PricingPlan {
+  plan_id: string;
+  name: string;
+  description: string | null;
+  audience: string | null;
+  price: {
+    amount: number | null;
+    currency: string | null;
+    cadence: "free" | "month" | "year" | "one-time" | "usage" | "custom";
+    unit: string | null;
+    qualifier: string | null;
+  };
+  features: string[];
+  limits: string[];
+  highlighted: boolean;
+  evidence_refs: string[];
+}
+
+export interface PricingPageCallToAction {
+  cta_id: string;
+  label: string;
+  kind: "start-free" | "start-trial" | "buy" | "contact-sales" | "book-demo" | "other";
+  destination: string | null;
+  plan_id: string | null;
+  evidence_refs: string[];
+}
+
+export interface PricingPageSnapshot {
+  schema_version: SchemaVersion;
+  snapshot_id: string;
+  source: ContentSource;
+  captured_at: string;
+  extraction: PageExtraction;
+  target_customer: string | null;
+  packaging: PricingPagePackaging;
+  plans: PricingPlan[];
+  calls_to_action: PricingPageCallToAction[];
+  trust_signals: Array<{
+    signal_id: string;
+    kind: "customer" | "testimonial" | "metric" | "security" | "guarantee" | "case-study" | "other";
+    claim: string;
+    attribution: string | null;
+    evidence_refs: string[];
+  }>;
+  objections_addressed: Array<{ statement: string; evidence_refs: string[] }>;
+  pricing_ambiguities: Array<{ statement: string; evidence_refs: string[] }>;
+  evidence: PageEvidenceReference[];
+  unknowns: string[];
+  extensions?: Record<string, unknown>;
+}
+
 export interface DecisionContext {
   schema_version: SchemaVersion;
   decision_id: string;

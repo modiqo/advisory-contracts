@@ -1,11 +1,11 @@
 {
   "name": "@modiqo/advisory-contracts",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Versioned, source-agnostic contracts for evidence-backed advisory workflows.",
   "type": "module",
   "license": "MIT",
   "files": [
-    "dist",
+    "dist/src",
     "schemas",
     "contract-manifest.json",
     "README.md",
@@ -24,7 +24,8 @@
     "typecheck": "tsc --noEmit",
     "validate": "tsx scripts/validate-examples.ts",
     "test": "tsx --test test/*.test.ts",
-    "check": "npm run typecheck && npm run validate && npm test"
+    "check": "npm run typecheck && npm run validate && npm test",
+    "prepack": "npm run check && npm run build"
   },
   "dependencies": {
     "ajv": "^8.17.1",

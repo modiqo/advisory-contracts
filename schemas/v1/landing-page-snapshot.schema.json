@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.modiqo.com/advisory/v1/landing-page-snapshot.schema.json",
+  "title": "Landing Page Snapshot",
+  "description": "A normalized, provenance-preserving representation of a rendered landing page or Markdown landing-page draft.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "snapshot_id", "source", "captured_at", "extraction", "positioning", "calls_to_action", "sections", "proof", "navigation", "metadata", "evidence", "unknowns"],
+  "properties": {
+    "schema_version": { "const": "v1" },
+    "snapshot_id": { "type": "string", "minLength": 1 },
+    "source": { "$ref": "https://schemas.modiqo.com/advisory/v1/content-source.schema.json" },
+    "captured_at": { "type": "string", "format": "date-time" },
+    "extraction": { "$ref": "#/$defs/extraction" },
+    "positioning": { "$ref": "#/$defs/positioning" },
+    "calls_to_action": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/callToAction" }
+    },
+    "sections": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/pageSection" }
+    },
+    "proof": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/proofItem" }
+    },
+    "navigation": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/navigationItem" }
+    },
+    "metadata": { "$ref": "#/$defs/pageMetadata" },
+    "evidence": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/evidenceReference" }
+    },
+    "unknowns": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "extensions": { "type": "object", "additionalProperties": true }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "source": {
+            "type": "object",
+            "properties": { "kind": { "const": "uri" } },
+            "required": ["kind"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "extraction": {
+            "type": "object",
+            "properties": {
+              "method": { "const": "rote-browse" },
+              "rendered": { "const": true },
+              "final_uri": { "type": "string", "format": "uri", "pattern": "^https?://" }
+            },
+            "required": ["final_uri"]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "source": {
+            "type": "object",
+            "properties": { "kind": { "const": "markdown" } },
+            "required": ["kind"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "extraction": {
+            "type": "object",
+            "properties": {
+              "method": { "const": "markdown-parser" },
+              "rendered": { "const": false }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "nullableString": { "type": ["string", "null"] },
+    "evidenceIds": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "extraction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "rendered", "capture_reference", "warnings"],
+      "properties": {
+        "method": { "enum": ["rote-browse", "markdown-parser"] },
+        "rendered": { "type": "boolean" },
+        "capture_reference": { "type": "string", "minLength": 1 },
+        "final_uri": { "type": "string", "format": "uri", "pattern": "^https?://" },
+        "warnings": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "positioning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["headline", "subheadline", "audience", "category", "problem", "promise", "evidence_refs"],
+      "properties": {
+        "headline": { "$ref": "#/$defs/nullableString" },
+        "subheadline": { "$ref": "#/$defs/nullableString" },
+        "audience": { "$ref": "#/$defs/nullableString" },
+        "category": { "$ref": "#/$defs/nullableString" },
+        "problem": { "$ref": "#/$defs/nullableString" },
+        "promise": { "$ref": "#/$defs/nullableString" },
+        "evidence_refs": { "$ref": "#/$defs/evidenceIds" }
+      }
+    },
+    "callToAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cta_id", "label", "kind", "destination", "evidence_refs"],
+      "properties": {
+        "cta_id": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 },
+        "kind": { "enum": ["primary", "secondary", "navigation", "form", "contact", "purchase", "other"] },
+        "destination": { "$ref": "#/$defs/nullableString" },
+        "evidence_refs": { "$ref": "#/$defs/evidenceIds" }
+      }
+    },
+    "pageSection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["section_id", "order", "section_type", "heading", "body_markdown", "evidence_refs"],
+      "properties": {
+        "section_id": { "type": "string", "minLength": 1 },
+        "order": { "type": "integer", "minimum": 0 },
+        "section_type": { "enum": ["hero", "problem", "benefits", "features", "proof", "how-it-works", "comparison", "pricing", "objection", "faq", "cta", "footer", "other"] },
+        "heading": { "$ref": "#/$defs/nullableString" },
+        "body_markdown": { "type": "string" },
+        "evidence_refs": { "$ref": "#/$defs/evidenceIds" }
+      }
+    },
+    "proofItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["proof_id", "kind", "claim", "attribution", "evidence_refs"],
+      "properties": {
+        "proof_id": { "type": "string", "minLength": 1 },
+        "kind": { "enum": ["testimonial", "customer", "metric", "case-study", "certification", "media", "other"] },
+        "claim": { "type": "string", "minLength": 1 },
+        "attribution": { "$ref": "#/$defs/nullableString" },
+        "evidence_refs": { "$ref": "#/$defs/evidenceIds" }
+      }
+    },
+    "navigationItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "destination", "evidence_refs"],
+      "properties": {
+        "label": { "type": "string", "minLength": 1 },
+        "destination": { "type": "string", "minLength": 1 },
+        "evidence_refs": { "$ref": "#/$defs/evidenceIds" }
+      }
+    },
+    "pageMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "description", "canonical_uri", "h1", "h2"],
+      "properties": {
+        "title": { "$ref": "#/$defs/nullableString" },
+        "description": { "$ref": "#/$defs/nullableString" },
+        "canonical_uri": {
+          "oneOf": [
+            { "type": "string", "format": "uri", "pattern": "^https?://" },
+            { "type": "null" }
+          ]
+        },
+        "h1": { "type": "array", "items": { "type": "string" } },
+        "h2": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "evidenceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_id", "locator", "excerpt"],
+      "properties": {
+        "evidence_id": { "type": "string", "minLength": 1 },
+        "locator": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "enum": ["browser-ref", "css-selector", "markdown-line-range", "uri-fragment", "capture-reference"] },
+            "value": { "type": "string", "minLength": 1 }
+          }
+        },
+        "excerpt": { "type": "string" },
+        "content_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+      }
+    }
+  }
+}
