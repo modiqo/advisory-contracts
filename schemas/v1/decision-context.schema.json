@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.modiqo.com/advisory/v1/decision-context.schema.json",
+  "title": "Decision Context",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "decision_id", "question", "actor", "trigger", "stakes", "reversibility", "constraints"],
+  "properties": {
+    "schema_version": { "const": "v1" },
+    "decision_id": { "type": "string", "minLength": 1 },
+    "question": { "type": "string", "minLength": 1 },
+    "actor": { "type": "string", "minLength": 1 },
+    "trigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "occurred_at"],
+      "properties": {
+        "kind": { "type": "string", "minLength": 1 },
+        "occurred_at": { "type": "string", "format": "date-time" },
+        "reference": { "type": "string" }
+      }
+    },
+    "decision_deadline": { "type": "string", "format": "date-time" },
+    "stakes": { "enum": ["low", "medium", "high", "critical"] },
+    "reversibility": { "enum": ["reversible", "costly", "irreversible"] },
+    "constraints": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "permitted_actions": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "extensions": { "type": "object", "additionalProperties": true }
+  }
+}

@@ -1,0 +1,6 @@
+[
+  { "schema": "evidence-bundle", "path": "valid/evidence-bundle.json", "valid": true },
+  { "schema": "action-intent", "path": "valid/action-intent.json", "valid": true },
+  { "schema": "evidence-bundle", "path": "invalid/evidence-bundle-missing-source-family.json", "valid": false },
+  { "schema": "action-intent", "path": "invalid/action-intent-executed-unapproved.json", "valid": false }
+]

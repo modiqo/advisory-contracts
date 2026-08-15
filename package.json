@@ -1,0 +1,44 @@
+{
+  "name": "@modiqo/advisory-contracts",
+  "version": "0.1.0",
+  "description": "Versioned, source-agnostic contracts for evidence-backed advisory workflows.",
+  "type": "module",
+  "license": "MIT",
+  "files": [
+    "dist",
+    "schemas",
+    "contract-manifest.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    },
+    "./schemas/*": "./schemas/*",
+    "./contract-manifest.json": "./contract-manifest.json"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "validate": "tsx scripts/validate-examples.ts",
+    "test": "tsx --test test/*.test.ts",
+    "check": "npm run typecheck && npm run validate && npm test"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

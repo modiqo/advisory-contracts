@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.modiqo.com/advisory/v1/decision.schema.json",
+  "title": "Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "decision_id", "generated_at", "recommendation", "scqa", "evidence_for", "evidence_against", "unknowns", "confidence", "assumptions", "reversibility", "success_threshold", "kill_criteria", "actions"],
+  "properties": {
+    "schema_version": { "const": "v1" },
+    "decision_id": { "type": "string", "minLength": 1 },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "recommendation": { "type": "string", "minLength": 1 },
+    "alternatives": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "disposition", "reason"],
+        "properties": {
+          "label": { "type": "string", "minLength": 1 },
+          "disposition": { "enum": ["preferred", "viable", "rejected", "deferred"] },
+          "reason": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "scqa": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["situation", "complication", "question", "answer"],
+      "properties": {
+        "situation": { "type": "string", "minLength": 1 },
+        "complication": { "type": "string", "minLength": 1 },
+        "question": { "type": "string", "minLength": 1 },
+        "answer": { "type": "string", "minLength": 1 }
+      }
+    },
+    "evidence_for": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "evidence_against": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "unknowns": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "confidence": { "enum": ["low", "medium", "high"] },
+    "assumptions": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "reversibility": { "enum": ["reversible", "costly", "irreversible"] },
+    "decision_deadline": { "type": "string", "format": "date-time" },
+    "success_threshold": { "type": "string", "minLength": 1 },
+    "kill_criteria": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "actions": { "type": "array", "items": { "$ref": "https://schemas.modiqo.com/advisory/v1/action-intent.schema.json" } },
+    "extensions": { "type": "object", "additionalProperties": true }
+  }
+}

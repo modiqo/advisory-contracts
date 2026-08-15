@@ -1,0 +1,11 @@
+{
+  "schema_version": "v1",
+  "action_id": "action-invalid",
+  "decision_id": "feature-42",
+  "action_type": "create-project",
+  "destination": "github:modiqo/product",
+  "payload_preview": { "title": "Prototype scheduled bulk exports" },
+  "rationale_evidence_ids": ["support-thread-91"],
+  "approval": { "required": true, "state": "proposed" },
+  "status": "executed"
+}

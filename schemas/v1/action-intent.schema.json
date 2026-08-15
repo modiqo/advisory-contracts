@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.modiqo.com/advisory/v1/action-intent.schema.json",
+  "title": "Action Intent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "action_id", "decision_id", "action_type", "destination", "payload_preview", "rationale_evidence_ids", "approval", "status"],
+  "properties": {
+    "schema_version": { "const": "v1" },
+    "action_id": { "type": "string", "minLength": 1 },
+    "decision_id": { "type": "string", "minLength": 1 },
+    "action_type": { "type": "string", "minLength": 1 },
+    "destination": { "type": "string", "minLength": 1 },
+    "owner": { "type": "string" },
+    "due_at": { "type": "string", "format": "date-time" },
+    "payload_preview": { "type": "object", "additionalProperties": true },
+    "rationale_evidence_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "state"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "state": { "enum": ["not-required", "proposed", "approved", "rejected"] },
+        "approved_by": { "type": "string" },
+        "approved_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "status": { "enum": ["proposed", "ready", "executed", "cancelled", "failed"] },
+    "idempotency_key": { "type": "string", "minLength": 1 },
+    "extensions": { "type": "object", "additionalProperties": true }
+  },
+  "allOf": [
+    {
+      "if": { "type": "object", "properties": { "status": { "const": "executed" } }, "required": ["status"] },
+      "then": { "type": "object", "properties": { "approval": { "type": "object", "properties": { "state": { "enum": ["approved", "not-required"] } } } } }
+    },
+    {
+      "if": { "type": "object", "properties": { "approval": { "type": "object", "properties": { "state": { "const": "approved" } }, "required": ["state"] } } },
+      "then": {
+        "type": "object",
+        "properties": {
+          "approval": {
+            "type": "object",
+            "properties": {
+              "approved_by": { "type": "string" },
+              "approved_at": { "type": "string", "format": "date-time" }
+            },
+            "required": ["approved_by", "approved_at"]
+          }
+        }
+      }
+    }
+  ]
+}

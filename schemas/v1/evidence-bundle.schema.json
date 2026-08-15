@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.modiqo.com/advisory/v1/evidence-bundle.schema.json",
+  "title": "Evidence Bundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "bundle_id", "decision_id", "generated_at", "items", "degraded_sources"],
+  "properties": {
+    "schema_version": { "const": "v1" },
+    "bundle_id": { "type": "string", "minLength": 1 },
+    "decision_id": { "type": "string", "minLength": 1 },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "items": {
+      "type": "array",
+      "items": { "$ref": "https://schemas.modiqo.com/advisory/v1/evidence-item.schema.json" }
+    },
+    "degraded_sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "reason"],
+        "properties": {
+          "source": { "type": "string", "minLength": 1 },
+          "reason": { "type": "string", "minLength": 1 },
+          "last_success_at": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "extensions": { "type": "object", "additionalProperties": true }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": "v1",
+  "bundle_id": "bundle-feature-42",
+  "decision_id": "feature-42",
+  "generated_at": "2026-08-14T18:00:00Z",
+  "items": [
+    {
+      "evidence_id": "support-thread-91",
+      "source": "gmail",
+      "source_family": "customer-communication",
+      "subject": "bulk export request",
+      "claim": "Three customers requested scheduled bulk exports this month.",
+      "stance": "supports",
+      "observed_at": "2026-08-14T17:30:00Z",
+      "confidence": { "level": "high", "reason": "Direct customer messages were retrieved." },
+      "sensitivity": "confidential",
+      "raw_reference": { "kind": "message", "value": "gmail:thread:91" }
+    }
+  ],
+  "degraded_sources": []
+}

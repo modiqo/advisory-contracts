@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.modiqo.com/advisory/v1/source-spec.schema.json",
+  "title": "Source Specification",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source_id", "capability", "required", "failure_mode", "sensitivity"],
+  "properties": {
+    "schema_version": { "const": "v1" },
+    "source_id": { "type": "string", "minLength": 1 },
+    "capability": { "type": "string", "minLength": 1 },
+    "required": { "type": "boolean" },
+    "freshness_sla_seconds": { "type": "integer", "minimum": 0 },
+    "failure_mode": { "enum": ["block", "degrade", "skip"] },
+    "sensitivity": { "enum": ["public", "internal", "confidential", "restricted"] },
+    "config": { "type": "object", "additionalProperties": true }
+  }
+}
