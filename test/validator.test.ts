@@ -324,6 +324,7 @@ test("founder sales follow-up uses private evidence and approval-only proposed a
   assert.match(harness, /settings\.provider \? \["--provider"/);
   assert.match(harness, /approval: \{ required: true, state: "proposed" \}/);
   assert.match(harness, /"create-email-draft"/);
+  assert.match(harness, /boundAgentCollections/);
   assert.doesNotMatch(harness, /"send-email"/);
   assert.doesNotMatch(harness, /for \(let attempt/);
 });
