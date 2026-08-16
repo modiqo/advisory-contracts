@@ -69,12 +69,12 @@ function checkEvidenceReferences(value: unknown, evidenceIds: Set<string>, path:
 }
 
 function validateSemanticReferences(schemaName: string, value: unknown): ErrorObject[] {
-  if (!["landing-page-snapshot", "pricing-page-snapshot", "conversation-artifact", "operating-brief"].includes(schemaName)) return [];
+  if (!["landing-page-snapshot", "pricing-page-snapshot", "conversation-artifact", "operating-brief", "sales-follow-up-package"].includes(schemaName)) return [];
   if (!value || typeof value !== "object" || Array.isArray(value)) return [];
 
   const record = value as Record<string, unknown>;
   const errors: ErrorObject[] = [];
-  if (schemaName !== "operating-brief") {
+  if (["landing-page-snapshot", "pricing-page-snapshot", "conversation-artifact"].includes(schemaName)) {
     const evidenceIds = recordIds(record, "evidence", "evidence_id", errors);
     checkEvidenceReferences(record, evidenceIds, "", errors);
   }
@@ -136,6 +136,30 @@ function validateSemanticReferences(schemaName: string, value: unknown): ErrorOb
       for (let expected = 1; expected <= priorities.length; expected += 1) {
         if (!ranks.has(expected)) errors.push(semanticError("/priorities", `ranks must be contiguous from 1; missing '${expected}'`, { missing: expected }));
       }
+    }
+  }
+
+  if (schemaName === "sales-follow-up-package") {
+    const actionIds = recordIds(record, "actions", "action_id", errors);
+    const packageId = record.package_id;
+    const actions = record.actions;
+    if (Array.isArray(actions)) {
+      actions.forEach((item, index) => {
+        if (!item || typeof item !== "object") return;
+        const action = item as Record<string, unknown>;
+        if (typeof packageId === "string" && action.decision_id !== packageId) {
+          errors.push(semanticError(`/actions/${index}/decision_id`, `must match package_id '${packageId}'`, { expected: packageId }));
+        }
+        const approval = action.approval;
+        if (!approval || typeof approval !== "object" || Array.isArray(approval)) return;
+        const approvalRecord = approval as Record<string, unknown>;
+        if (approvalRecord.required !== true || approvalRecord.state !== "proposed" || action.status !== "proposed") {
+          errors.push(semanticError(`/actions/${index}`, "sales follow-up actions must remain approval-required proposals"));
+        }
+      });
+    }
+    if (actionIds.size === 0) {
+      errors.push(semanticError("/actions", "must contain at least one proposed action"));
     }
   }
 

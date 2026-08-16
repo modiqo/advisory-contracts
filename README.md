@@ -16,13 +16,14 @@ The JSON Schemas are canonical. TypeScript types and runtime validation are conv
 - `advisory-rubric`: remixable expert guidance, including Crucible/Heavybit skills
 - `decision`: recommendation, counter-evidence, unknowns, thresholds, and kill criteria
 - `operating-brief`: a bounded top-three priority brief with one approval-gated next action per priority
+- `sales-follow-up-package`: an evidence-linked deal recap, editable email draft, risks, commitments, and approval-gated CRM/task proposals
 - `action-intent`: previewable, approval-gated downstream effects
 - `module-manifest`: what a collector, advisor, challenger, renderer, or writer consumes and produces
 - `run-manifest`: exact contract, adapters, modules, and degraded stages used by a run
 
 ## Use directly
 
-Until the npm package is published, pin a GitHub release or commit and consume `schemas/v1/*.schema.json` directly. Validate at every module boundary. Contract version `0.2.0` carries schema family `v1`; additive changes stay in `v1`, while breaking changes create `v2`.
+Until the npm package is published, pin a GitHub release or commit and consume `schemas/v1/*.schema.json` directly. Validate at every module boundary. Contract version `0.4.0` carries schema family `v1`; additive changes stay in `v1`, while breaking changes create `v2`.
 
 ```ts
 import { ContractValidator } from "@modiqo/advisory-contracts";
@@ -99,6 +100,24 @@ approval-gated writer
         -> ActionIntent v1
 ```
 
+### Founder sales follow-up harness
+
+`scripts/founder-sales-follow-up-agent-harness.ts` consumes one absolute-path,
+private JSON file containing normalized `ConversationArtifact` records plus an
+`EvidenceBundle`. This keeps raw meeting notes, email facts, and CRM facts out
+of Play parameters and process argv. The harness compacts those inputs, invokes
+exactly one selected reasoning CLI, and validates the resulting
+`SalesFollowUpPackage`.
+
+Recipients and record IDs come from the validated input, never from the model.
+The model may draft an email and propose CRM changes or internal tasks, but the
+harness constructs every downstream `ActionIntent` with approval required and
+status `proposed`. It never sends mail, updates a CRM, or creates a task.
+
+Published Plays should run a typed Crucible `sales_and_commercial` /
+`enterprise-readiness` step first, then invoke a commit-pinned harness URL with
+`rote deno`. The optional `--rubric` argument is only for isolated development.
+
 Every run should emit a `run-manifest` with the contract version and content digest so a result can be reproduced and audited.
 
 ### Pricing-page reasoning harness
@@ -156,4 +175,4 @@ auth_crucible
 
 ## Status
 
-This repository is at `0.3.0`: suitable for experimentation and Play authoring, but not yet promised as a stable 1.0 API.
+This repository is at `0.4.0`: suitable for experimentation and Play authoring, but not yet promised as a stable 1.0 API.

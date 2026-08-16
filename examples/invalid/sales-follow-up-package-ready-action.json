@@ -1,0 +1,37 @@
+{
+  "schema_version": "v1",
+  "package_id": "sales-follow-up-acme-unsafe",
+  "generated_at": "2026-08-15T18:00:00Z",
+  "actor": "Founder",
+  "account": { "name": "Acme" },
+  "conversation_artifact_ids": ["conversation-acme-2026-08-15"],
+  "evidence_bundle_id": "bundle-acme-follow-up",
+  "recap": "Acme requested a follow-up.",
+  "customer_needs": [],
+  "objections": [],
+  "commitments": [],
+  "open_questions": [],
+  "deal_risks": [],
+  "email_draft": {
+    "to": ["ari@acme.example"],
+    "cc": [],
+    "subject": "Follow-up",
+    "body_markdown": "Hi Ari, thanks for your time.",
+    "evidence_refs": ["meeting-evidence-1"]
+  },
+  "actions": [
+    {
+      "schema_version": "v1",
+      "action_id": "unsafe-ready-email",
+      "decision_id": "sales-follow-up-acme-unsafe",
+      "action_type": "send-email",
+      "destination": "gmail:send",
+      "payload_preview": { "to": ["ari@acme.example"] },
+      "rationale_evidence_ids": ["meeting-evidence-1"],
+      "approval": { "required": true, "state": "proposed" },
+      "status": "ready"
+    }
+  ],
+  "source_coverage": [],
+  "unknowns": []
+}

@@ -1,0 +1,91 @@
+{
+  "actor": "Founder",
+  "account": { "name": "Acme", "crm_record_id": "hubspot:company:123" },
+  "primary_contact": { "name": "Ari", "email": "ari@acme.example" },
+  "cc": ["sales@ourcompany.example"],
+  "expected_sources": ["granola", "gmail", "hubspot"],
+  "goal": "Move the 40-seat expansion forward without promising an unconfirmed product date.",
+  "conversation_artifacts": [
+    {
+      "schema_version": "v1",
+      "artifact_id": "conversation-acme-2026-08-15",
+      "source": {
+        "provider": "granola",
+        "source_id": "not_123",
+        "captured_at": "2026-08-15T17:10:00Z",
+        "raw_reference": { "kind": "record", "value": "granola:note:not_123" }
+      },
+      "title": "Acme expansion review",
+      "started_at": "2026-08-15T16:00:00Z",
+      "ended_at": "2026-08-15T16:30:00Z",
+      "participants": [
+        { "participant_id": "p1", "display_name": "Ari", "email": "ari@acme.example", "role": "customer" },
+        { "participant_id": "p2", "display_name": "Founder", "role": "internal" }
+      ],
+      "summary_markdown": "Acme is ready to expand from 10 to 50 seats after scheduled exports and the security review are resolved.",
+      "transcript_segments": [
+        {
+          "segment_id": "segment-1",
+          "speaker": { "participant_id": "p1", "display_name": "Ari" },
+          "start_seconds": 312,
+          "end_seconds": 321,
+          "text": "We can expand to the additional 40 seats once scheduled exports are available."
+        },
+        {
+          "segment_id": "segment-2",
+          "speaker": { "participant_id": "p2", "display_name": "Founder" },
+          "start_seconds": 401,
+          "end_seconds": 409,
+          "text": "I will confirm feasibility with engineering and follow up tomorrow."
+        }
+      ],
+      "identified_decisions": [
+        { "item_id": "meeting-decision-1", "statement": "Do not promise a product date before engineering confirms it.", "owner": "Founder", "evidence_refs": ["meeting-export-need"] }
+      ],
+      "action_items": [
+        { "item_id": "meeting-action-1", "description": "Send Acme a feasibility update.", "owner": "Founder", "due_at": "2026-08-16T23:59:59Z", "status": "open", "evidence_refs": ["meeting-founder-commitment"] }
+      ],
+      "evidence": [
+        { "evidence_id": "meeting-export-need", "locator": { "kind": "transcript-segment", "value": "segment-1" }, "excerpt": "We can expand to the additional 40 seats once scheduled exports are available." },
+        { "evidence_id": "meeting-founder-commitment", "locator": { "kind": "transcript-segment", "value": "segment-2" }, "excerpt": "I will confirm feasibility with engineering and follow up tomorrow." }
+      ],
+      "unknowns": ["Engineering has not committed to a delivery date."],
+      "sensitivity": "confidential"
+    }
+  ],
+  "evidence_bundle": {
+    "schema_version": "v1",
+    "bundle_id": "bundle-acme-follow-up",
+    "decision_id": "acme-expansion-follow-up",
+    "generated_at": "2026-08-15T17:45:00Z",
+    "items": [
+      {
+        "evidence_id": "email-security-1",
+        "source": "gmail",
+        "source_family": "customer-communication",
+        "subject": "Acme security review",
+        "claim": "Acme's reviewer asked for the current data-retention policy before approving rollout.",
+        "stance": "supports",
+        "observed_at": "2026-08-15T17:30:00Z",
+        "confidence": { "level": "high", "reason": "Direct customer email." },
+        "sensitivity": "confidential",
+        "raw_reference": { "kind": "message", "value": "gmail:thread:security-123" }
+      },
+      {
+        "evidence_id": "crm-expansion-1",
+        "source": "hubspot",
+        "source_family": "crm",
+        "subject": "Acme expansion opportunity",
+        "claim": "The opportunity is recorded as a 40-seat expansion with no next-step date.",
+        "stance": "supports",
+        "observed_at": "2026-08-15T17:35:00Z",
+        "confidence": { "level": "high", "reason": "Current CRM opportunity record." },
+        "sensitivity": "confidential",
+        "raw_reference": { "kind": "record", "value": "hubspot:deal:456" }
+      }
+    ],
+    "degraded_sources": [
+      { "source": "product-roadmap", "reason": "No approved delivery date was supplied." }
+    ]
+  }
+}

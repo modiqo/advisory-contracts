@@ -353,3 +353,54 @@ export interface OperatingBrief {
   unknowns: string[];
   extensions?: Record<string, unknown>;
 }
+
+export interface SalesFollowUpPackage {
+  schema_version: SchemaVersion;
+  package_id: string;
+  generated_at: string;
+  actor: string;
+  account: { name: string; crm_record_id?: string };
+  conversation_artifact_ids: string[];
+  evidence_bundle_id: string;
+  recap: string;
+  customer_needs: Array<{ statement: string; evidence_refs: string[] }>;
+  objections: Array<{
+    objection: string;
+    response_position: string;
+    evidence_refs: string[];
+  }>;
+  commitments: Array<{
+    party: "us" | "customer" | "shared" | "unknown";
+    commitment: string;
+    owner?: string;
+    due_at?: string;
+    evidence_refs: string[];
+  }>;
+  open_questions: Array<{
+    question: string;
+    owner?: string;
+    evidence_refs: string[];
+  }>;
+  deal_risks: Array<{
+    risk: string;
+    severity: "low" | "medium" | "high";
+    mitigation: string;
+    evidence_refs: string[];
+  }>;
+  email_draft: {
+    to: string[];
+    cc: string[];
+    subject: string;
+    body_markdown: string;
+    evidence_refs: string[];
+  };
+  actions: ActionIntent[];
+  source_coverage: Array<{
+    source: string;
+    status: "fresh" | "degraded" | "missing";
+    detail: string;
+    last_observed_at?: string;
+  }>;
+  unknowns: string[];
+  extensions?: Record<string, unknown>;
+}

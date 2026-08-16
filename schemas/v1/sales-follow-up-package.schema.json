@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.modiqo.com/advisory/v1/sales-follow-up-package.schema.json",
+  "title": "Sales Follow-up Package",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "package_id", "generated_at", "actor", "account", "conversation_artifact_ids", "evidence_bundle_id", "recap", "customer_needs", "objections", "commitments", "open_questions", "deal_risks", "email_draft", "actions", "source_coverage", "unknowns"],
+  "properties": {
+    "schema_version": { "const": "v1" },
+    "package_id": { "type": "string", "minLength": 1 },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "actor": { "type": "string", "minLength": 1 },
+    "account": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "crm_record_id": { "type": "string", "minLength": 1, "maxLength": 200 }
+      }
+    },
+    "conversation_artifact_ids": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "evidence_bundle_id": { "type": "string", "minLength": 1 },
+    "recap": { "type": "string", "minLength": 1, "maxLength": 1200 },
+    "customer_needs": {
+      "type": "array",
+      "maxItems": 5,
+      "items": { "$ref": "#/$defs/evidenceStatement" }
+    },
+    "objections": {
+      "type": "array",
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["objection", "response_position", "evidence_refs"],
+        "properties": {
+          "objection": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "response_position": { "type": "string", "minLength": 1, "maxLength": 700 },
+          "evidence_refs": { "$ref": "#/$defs/evidenceRefs" }
+        }
+      }
+    },
+    "commitments": {
+      "type": "array",
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["party", "commitment", "evidence_refs"],
+        "properties": {
+          "party": { "enum": ["us", "customer", "shared", "unknown"] },
+          "commitment": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "owner": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "due_at": { "type": "string", "format": "date-time" },
+          "evidence_refs": { "$ref": "#/$defs/evidenceRefs" }
+        }
+      }
+    },
+    "open_questions": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["question", "evidence_refs"],
+        "properties": {
+          "question": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "owner": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "evidence_refs": { "$ref": "#/$defs/evidenceRefs" }
+        }
+      }
+    },
+    "deal_risks": {
+      "type": "array",
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["risk", "severity", "mitigation", "evidence_refs"],
+        "properties": {
+          "risk": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "severity": { "enum": ["low", "medium", "high"] },
+          "mitigation": { "type": "string", "minLength": 1, "maxLength": 700 },
+          "evidence_refs": { "$ref": "#/$defs/evidenceRefs" }
+        }
+      }
+    },
+    "email_draft": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["to", "cc", "subject", "body_markdown", "evidence_refs"],
+      "properties": {
+        "to": { "type": "array", "maxItems": 5, "items": { "type": "string", "format": "email" }, "uniqueItems": true },
+        "cc": { "type": "array", "maxItems": 10, "items": { "type": "string", "format": "email" }, "uniqueItems": true },
+        "subject": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "body_markdown": { "type": "string", "minLength": 1, "maxLength": 4000 },
+        "evidence_refs": { "$ref": "#/$defs/evidenceRefs" }
+      }
+    },
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 6,
+      "items": { "$ref": "https://schemas.modiqo.com/advisory/v1/action-intent.schema.json" }
+    },
+    "source_coverage": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "status", "detail"],
+        "properties": {
+          "source": { "type": "string", "minLength": 1 },
+          "status": { "enum": ["fresh", "degraded", "missing"] },
+          "detail": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "last_observed_at": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "unknowns": { "type": "array", "maxItems": 6, "items": { "type": "string", "minLength": 1, "maxLength": 400 } },
+    "extensions": { "type": "object", "additionalProperties": true }
+  },
+  "$defs": {
+    "evidenceRefs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "evidenceStatement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statement", "evidence_refs"],
+      "properties": {
+        "statement": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "evidence_refs": { "$ref": "#/$defs/evidenceRefs" }
+      }
+    }
+  }
+}

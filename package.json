@@ -1,6 +1,6 @@
 {
   "name": "@modiqo/advisory-contracts",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Versioned, source-agnostic contracts for evidence-backed advisory workflows.",
   "type": "module",
   "license": "MIT",

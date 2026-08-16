@@ -1,6 +1,6 @@
 {
   "name": "@modiqo/advisory-contracts",
-  "contract_version": "0.3.0",
+  "contract_version": "0.4.0",
   "schema_version": "v1",
   "draft": "https://json-schema.org/draft/2020-12/schema",
   "schemas": [
@@ -16,6 +16,7 @@
     { "name": "action-intent", "path": "schemas/v1/action-intent.schema.json" },
     { "name": "decision", "path": "schemas/v1/decision.schema.json" },
     { "name": "operating-brief", "path": "schemas/v1/operating-brief.schema.json" },
+    { "name": "sales-follow-up-package", "path": "schemas/v1/sales-follow-up-package.schema.json" },
     { "name": "module-manifest", "path": "schemas/v1/module-manifest.schema.json" },
     { "name": "run-manifest", "path": "schemas/v1/run-manifest.schema.json" }
   ]

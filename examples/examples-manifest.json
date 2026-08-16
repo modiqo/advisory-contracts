@@ -7,6 +7,7 @@
   { "schema": "evidence-bundle", "path": "valid/evidence-bundle.json", "valid": true },
   { "schema": "action-intent", "path": "valid/action-intent.json", "valid": true },
   { "schema": "operating-brief", "path": "valid/operating-brief.json", "valid": true },
+  { "schema": "sales-follow-up-package", "path": "valid/sales-follow-up-package.json", "valid": true },
   { "schema": "content-source", "path": "invalid/content-source-both-uri-and-markdown.json", "valid": false },
   { "schema": "content-source", "path": "invalid/content-source-unsafe-uri.json", "valid": false },
   { "schema": "landing-page-snapshot", "path": "invalid/landing-page-snapshot-missing-evidence.json", "valid": false },
@@ -14,5 +15,6 @@
   { "schema": "conversation-artifact", "path": "invalid/conversation-artifact-missing-evidence.json", "valid": false },
   { "schema": "evidence-bundle", "path": "invalid/evidence-bundle-missing-source-family.json", "valid": false },
   { "schema": "action-intent", "path": "invalid/action-intent-executed-unapproved.json", "valid": false },
-  { "schema": "operating-brief", "path": "invalid/operating-brief-duplicate-rank.json", "valid": false }
+  { "schema": "operating-brief", "path": "invalid/operating-brief-duplicate-rank.json", "valid": false },
+  { "schema": "sales-follow-up-package", "path": "invalid/sales-follow-up-package-ready-action.json", "valid": false }
 ]

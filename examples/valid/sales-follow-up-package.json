@@ -1,0 +1,67 @@
+{
+  "schema_version": "v1",
+  "package_id": "sales-follow-up-acme-2026-08-15",
+  "generated_at": "2026-08-15T18:00:00Z",
+  "actor": "Founder",
+  "account": { "name": "Acme", "crm_record_id": "hubspot:company:123" },
+  "conversation_artifact_ids": ["conversation-acme-2026-08-15"],
+  "evidence_bundle_id": "bundle-acme-follow-up",
+  "recap": "Acme is considering a 40-seat expansion after scheduled exports and its security review are resolved.",
+  "customer_needs": [
+    { "statement": "Scheduled exports are required for the expansion.", "evidence_refs": ["meeting-evidence-1"] }
+  ],
+  "objections": [
+    {
+      "objection": "The security reviewer still needs a current data-retention answer.",
+      "response_position": "Send the approved retention statement and offer a reviewer call.",
+      "evidence_refs": ["email-security-1"]
+    }
+  ],
+  "commitments": [
+    {
+      "party": "us",
+      "commitment": "Send a feasibility update for scheduled exports.",
+      "owner": "Founder",
+      "evidence_refs": ["meeting-evidence-1"]
+    }
+  ],
+  "open_questions": [
+    { "question": "What date can engineering commit to for scheduled exports?", "owner": "Founder", "evidence_refs": ["meeting-evidence-1"] }
+  ],
+  "deal_risks": [
+    {
+      "risk": "The expansion may slip if Acme receives no delivery date.",
+      "severity": "high",
+      "mitigation": "Confirm feasibility internally before promising a date.",
+      "evidence_refs": ["meeting-evidence-1"]
+    }
+  ],
+  "email_draft": {
+    "to": ["ari@acme.example"],
+    "cc": [],
+    "subject": "Acme follow-up: exports and security review",
+    "body_markdown": "Hi Ari,\n\nThanks for the clear discussion. We are confirming the scheduled-export timeline and will send the approved data-retention answer next.\n\nBest,\nFounder",
+    "evidence_refs": ["meeting-evidence-1", "email-security-1"]
+  },
+  "actions": [
+    {
+      "schema_version": "v1",
+      "action_id": "draft-acme-email",
+      "decision_id": "sales-follow-up-acme-2026-08-15",
+      "action_type": "create-email-draft",
+      "destination": "gmail:draft",
+      "owner": "Founder",
+      "payload_preview": { "to": ["ari@acme.example"], "subject": "Acme follow-up: exports and security review" },
+      "rationale_evidence_ids": ["meeting-evidence-1", "email-security-1"],
+      "approval": { "required": true, "state": "proposed" },
+      "status": "proposed"
+    }
+  ],
+  "source_coverage": [
+    { "source": "granola", "status": "fresh", "detail": "One conversation artifact supplied.", "last_observed_at": "2026-08-15T17:10:00Z" },
+    { "source": "gmail", "status": "fresh", "detail": "One evidence item supplied.", "last_observed_at": "2026-08-15T17:30:00Z" },
+    { "source": "hubspot", "status": "degraded", "detail": "The CRM adapter is unavailable." }
+  ],
+  "unknowns": ["Engineering has not committed to a scheduled-export date."],
+  "extensions": { "contract": { "package_version": "0.4.0" } }
+}

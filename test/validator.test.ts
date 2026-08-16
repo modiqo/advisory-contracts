@@ -201,6 +201,30 @@ test("accepts compact operating briefs and rejects ambiguous ranks", () => {
   );
 });
 
+test("accepts sales follow-up packages and rejects actions that can bypass approval", () => {
+  const valid = JSON.parse(
+    readFileSync("examples/valid/sales-follow-up-package.json", "utf8"),
+  );
+  const unsafe = JSON.parse(
+    readFileSync(
+      "examples/invalid/sales-follow-up-package-ready-action.json",
+      "utf8",
+    ),
+  );
+  assert.equal(
+    validator.validate("sales-follow-up-package", valid).valid,
+    true,
+  );
+  const unsafeResult = validator.validate("sales-follow-up-package", unsafe);
+  assert.equal(unsafeResult.valid, false);
+  assert.ok(
+    unsafeResult.errors.some((error) =>
+      error.keyword === "contractReference" &&
+      error.instancePath === "/actions/0"
+    ),
+  );
+});
+
 test("requires URI snapshots to come from a rendered rote browse capture", () => {
   const landing = JSON.parse(
     readFileSync("examples/valid/landing-page-snapshot-uri.json", "utf8"),
@@ -280,5 +304,26 @@ test("founder daily brief uses private file input and a bounded one-shot reasoni
   assert.match(harness, /model_reasoning_effort/);
   assert.match(harness, /settings\.provider \? \["--provider"/);
   assert.match(harness, /approval: \{ required: true, state: "proposed" \}/);
+  assert.doesNotMatch(harness, /for \(let attempt/);
+});
+
+test("founder sales follow-up uses private evidence and approval-only proposed actions", () => {
+  const harness = readFileSync(
+    "scripts/founder-sales-follow-up-agent-harness.ts",
+    "utf8",
+  );
+  assert.match(harness, /const REASONING_TIMEOUT_MS = 27_000/);
+  assert.match(harness, /const MAX_EVIDENCE_CHARS = 6_000/);
+  assert.match(harness, /const MAX_RUBRIC_CHARS = 1_200/);
+  assert.match(harness, /--input-file/);
+  assert.match(
+    harness,
+    /type ReasoningAgent = "codex" \| "claude" \| "kimi" \| "pi" \| "hermes"/,
+  );
+  assert.match(harness, /model_reasoning_effort/);
+  assert.match(harness, /settings\.provider \? \["--provider"/);
+  assert.match(harness, /approval: \{ required: true, state: "proposed" \}/);
+  assert.match(harness, /"create-email-draft"/);
+  assert.doesNotMatch(harness, /"send-email"/);
   assert.doesNotMatch(harness, /for \(let attempt/);
 });
