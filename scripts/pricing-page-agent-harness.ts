@@ -252,6 +252,14 @@ function snapshotIdFromOutput(output: string): string | null {
     output.match(/snapshot saved as\s+(@\d+)/i)?.[1] ?? null;
 }
 
+function capturedSnapshotId(opened: { stdout: string; stderr: string }): string {
+  const snapshotId = snapshotIdFromOutput(`${opened.stdout}\n${opened.stderr}`);
+  if (!snapshotId) {
+    throw new Error("rote-browse navigation completed without a captured page snapshot");
+  }
+  return snapshotId;
+}
+
 function isPricingRubricCall(paramsText: string): boolean {
   try {
     const command = JSON.parse(paramsText) as {
@@ -353,28 +361,9 @@ async function captureUri(source: string): Promise<{
     throw new Error(`rote-browse navigation failed: ${opened.stderr.trim() || opened.stdout.trim()}`);
   }
   const cwd = `${workspaceRoot()}/${workspace}`;
-  const waited = await runCommand([
-    "rote",
-    "browse",
-    "wait",
-    "--quiet-ms",
-    "1500",
-    "--timeout",
-    "30",
-  ], { cwd, timeoutMs: 40_000 });
-  if (waited.code !== 0) {
-    throw new Error(`rote-browse readiness wait failed: ${waited.stderr.trim() || waited.stdout.trim()}`);
-  }
-  const snap = await runCommand(["rote", "browse", "snapshot"], {
-    cwd,
-    timeoutMs: 40_000,
-  });
-  if (snap.code !== 0) {
-    throw new Error(`rote-browse snapshot failed: ${snap.stderr.trim() || snap.stdout.trim()}`);
-  }
-  const snapshotId = snapshotIdFromOutput(`${snap.stdout}\n${snap.stderr}`) ??
-    snapshotIdFromOutput(`${opened.stdout}\n${opened.stderr}`);
-  if (!snapshotId) throw new Error("rote-browse did not report a snapshot response id");
+  // `rote browse` already records a rendered snapshot. Use that evidence immediately:
+  // pages with continuous animation may never satisfy a whole-DOM quiet wait.
+  const snapshotId = capturedSnapshotId(opened);
   const queried = await runCommand([
     "rote",
     "query",

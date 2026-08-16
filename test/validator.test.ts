@@ -87,3 +87,14 @@ test("requires URI snapshots to come from a rendered rote browse capture", () =>
   landing.extraction.rendered = false;
   assert.equal(validator.validate("landing-page-snapshot", landing).valid, false);
 });
+
+test("assessment harnesses consume the rendered navigation snapshot without a DOM-quiet wait", () => {
+  for (const path of [
+    "scripts/landing-page-agent-harness.ts",
+    "scripts/pricing-page-agent-harness.ts",
+  ]) {
+    const harness = readFileSync(path, "utf8");
+    assert.match(harness, /const snapshotId = capturedSnapshotId\(opened\)/);
+    assert.doesNotMatch(harness, /"--quiet-ms"/);
+  }
+});

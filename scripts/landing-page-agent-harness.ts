@@ -385,6 +385,14 @@ function snapshotIdFromOutput(output: string): string | null {
     output.match(/snapshot saved as\s+(@\d+)/i)?.[1] ?? null;
 }
 
+function capturedSnapshotId(opened: { stdout: string; stderr: string }): string {
+  const snapshotId = snapshotIdFromOutput(`${opened.stdout}\n${opened.stderr}`);
+  if (!snapshotId) {
+    throw new Error("rote-browse navigation completed without a captured page snapshot");
+  }
+  return snapshotId;
+}
+
 function isMessagingRubricCall(paramsText: string): boolean {
   try {
     const command = JSON.parse(paramsText) as {
@@ -494,8 +502,9 @@ async function captureUri(source: string): Promise<{
     throw new Error(`rote-browse navigation failed: ${opened.stderr.trim() || opened.stdout.trim()}`);
   }
   const cwd = `${workspaceRoot()}/${workspace}`;
-  const snapshotId = snapshotIdFromOutput(`${opened.stdout}\n${opened.stderr}`);
-  if (!snapshotId) throw new Error("rote-browse did not report a snapshot response id");
+  // `rote browse` already records a rendered snapshot. Use that evidence immediately:
+  // pages with continuous animation may never satisfy a whole-DOM quiet wait.
+  const snapshotId = capturedSnapshotId(opened);
   const queried = await runCommand([
     "rote",
     "query",
