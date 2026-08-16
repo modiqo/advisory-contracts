@@ -11,9 +11,11 @@ The JSON Schemas are canonical. TypeScript types and runtime validation are conv
 - `content-source`: a safe discriminated input containing either an HTTP(S) URI or inline Markdown
 - `landing-page-snapshot`: normalized landing-page messaging, sections, CTAs, proof, metadata, and exact evidence references
 - `pricing-page-snapshot`: normalized plans, packaging, value metric, CTAs, trust signals, ambiguities, and exact evidence references
+- `conversation-artifact`: provider-neutral meeting notes, summaries, transcript segments, decisions, actions, and exact evidence references
 - `evidence-item` and `evidence-bundle`: provenance-preserving normalized evidence
 - `advisory-rubric`: remixable expert guidance, including Crucible/Heavybit skills
 - `decision`: recommendation, counter-evidence, unknowns, thresholds, and kill criteria
+- `operating-brief`: a bounded top-three priority brief with one approval-gated next action per priority
 - `action-intent`: previewable, approval-gated downstream effects
 - `module-manifest`: what a collector, advisor, challenger, renderer, or writer consumes and produces
 - `run-manifest`: exact contract, adapters, modules, and degraded stages used by a run
@@ -87,6 +89,8 @@ A future `crucible-heavybit/advisory-contracts` Play can serve as the discoverab
 ```text
 Gmail / GitHub / CRM / web collectors
         -> EvidenceBundle v1
+Zoom / Granola / Gong / pasted-note collectors
+        -> ConversationArtifact v1 -> EvidenceBundle v1
 Crucible / Heavybit advisory rubric
         -> AdvisoryRubric v1
 decision synthesis + challenger
@@ -152,4 +156,4 @@ auth_crucible
 
 ## Status
 
-This repository is at `0.2.0`: suitable for experimentation and Play authoring, but not yet promised as a stable 1.0 API.
+This repository is at `0.3.0`: suitable for experimentation and Play authoring, but not yet promised as a stable 1.0 API.

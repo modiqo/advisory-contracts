@@ -1,0 +1,39 @@
+{
+  "schema_version": "v1",
+  "brief_id": "brief-founder-2026-08-15",
+  "actor": "Founder",
+  "generated_at": "2026-08-15T17:30:00Z",
+  "window": { "start": "2026-08-14T17:30:00Z", "end": "2026-08-15T17:30:00Z" },
+  "headline": "Protect the Acme expansion before starting lower-leverage work.",
+  "evidence_bundle_id": "bundle-founder-2026-08-15",
+  "priorities": [
+    {
+      "priority_id": "priority-acme-export",
+      "rank": 1,
+      "title": "Unblock Acme's expansion",
+      "recommendation": "Confirm whether a narrow scheduled-export pilot can ship this sprint.",
+      "why_now": "A customer tied expansion directly to this capability in today's call.",
+      "evidence_for": ["meeting-evidence-1"],
+      "evidence_against": [],
+      "confidence": "high",
+      "success_signal": "Acme agrees to the pilot scope and expansion date.",
+      "next_action": {
+        "schema_version": "v1",
+        "action_id": "action-acme-export",
+        "decision_id": "priority-acme-export",
+        "action_type": "draft-customer-follow-up",
+        "destination": "gmail:draft",
+        "payload_preview": { "subject": "Scheduled export pilot" },
+        "rationale_evidence_ids": ["meeting-evidence-1"],
+        "approval": { "required": true, "state": "proposed" },
+        "status": "proposed"
+      }
+    }
+  ],
+  "watchlist": [],
+  "source_coverage": [
+    { "source": "granola", "status": "fresh", "detail": "Today's customer notes and transcript were available.", "last_observed_at": "2026-08-15T16:30:00Z" },
+    { "source": "crm", "status": "missing", "detail": "No CRM adapter is installed." }
+  ],
+  "unknowns": ["Current Acme deal value is unavailable."]
+}

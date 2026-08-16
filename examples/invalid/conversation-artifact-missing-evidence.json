@@ -1,0 +1,22 @@
+{
+  "schema_version": "v1",
+  "artifact_id": "conversation-acme-2026-08-15",
+  "source": {
+    "provider": "zoom",
+    "source_id": "meeting-123",
+    "captured_at": "2026-08-15T17:10:00Z",
+    "raw_reference": { "kind": "record", "value": "zoom:meeting:123" }
+  },
+  "title": "Acme onboarding review",
+  "started_at": "2026-08-15T16:00:00Z",
+  "participants": [],
+  "summary_markdown": "Acme needs scheduled exports.",
+  "transcript_segments": [],
+  "identified_decisions": [
+    { "item_id": "meeting-decision-1", "statement": "Evaluate scheduled exports.", "evidence_refs": ["missing-evidence"] }
+  ],
+  "action_items": [],
+  "evidence": [],
+  "unknowns": [],
+  "sensitivity": "confidential"
+}

@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.modiqo.com/advisory/v1/conversation-artifact.schema.json",
+  "title": "Conversation Artifact",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_id", "source", "title", "started_at", "participants", "transcript_segments", "identified_decisions", "action_items", "evidence", "unknowns", "sensitivity"],
+  "properties": {
+    "schema_version": { "const": "v1" },
+    "artifact_id": { "type": "string", "minLength": 1 },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "source_id", "captured_at", "raw_reference"],
+      "properties": {
+        "provider": { "type": "string", "minLength": 1 },
+        "source_id": { "type": "string", "minLength": 1 },
+        "captured_at": { "type": "string", "format": "date-time" },
+        "raw_reference": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "enum": ["url", "adapter-response", "file", "record", "manual"] },
+            "value": { "type": "string", "minLength": 1 },
+            "content_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+          }
+        }
+      }
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+    "started_at": { "type": "string", "format": "date-time" },
+    "ended_at": { "type": "string", "format": "date-time" },
+    "participants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["display_name"],
+        "properties": {
+          "participant_id": { "type": "string", "minLength": 1 },
+          "display_name": { "type": "string", "minLength": 1 },
+          "email": { "type": "string", "format": "email" },
+          "role": { "enum": ["internal", "customer", "prospect", "partner", "investor", "candidate", "unknown"] }
+        }
+      }
+    },
+    "notes_markdown": { "type": "string", "minLength": 1 },
+    "summary_markdown": { "type": "string", "minLength": 1 },
+    "transcript_segments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["segment_id", "text"],
+        "properties": {
+          "segment_id": { "type": "string", "minLength": 1 },
+          "speaker": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "participant_id": { "type": "string", "minLength": 1 },
+              "display_name": { "type": "string", "minLength": 1 },
+              "provider_label": { "type": "string", "minLength": 1 }
+            },
+            "anyOf": [
+              { "properties": { "participant_id": { "type": "string" } }, "required": ["participant_id"] },
+              { "properties": { "display_name": { "type": "string" } }, "required": ["display_name"] },
+              { "properties": { "provider_label": { "type": "string" } }, "required": ["provider_label"] }
+            ]
+          },
+          "start_seconds": { "type": "number", "minimum": 0 },
+          "end_seconds": { "type": "number", "minimum": 0 },
+          "text": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "identified_decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["item_id", "statement", "evidence_refs"],
+        "properties": {
+          "item_id": { "type": "string", "minLength": 1 },
+          "statement": { "type": "string", "minLength": 1 },
+          "owner": { "type": "string", "minLength": 1 },
+          "evidence_refs": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }
+        }
+      }
+    },
+    "action_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["item_id", "description", "status", "evidence_refs"],
+        "properties": {
+          "item_id": { "type": "string", "minLength": 1 },
+          "description": { "type": "string", "minLength": 1 },
+          "owner": { "type": "string", "minLength": 1 },
+          "due_at": { "type": "string", "format": "date-time" },
+          "status": { "enum": ["open", "done", "unknown"] },
+          "evidence_refs": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["evidence_id", "locator", "excerpt"],
+        "properties": {
+          "evidence_id": { "type": "string", "minLength": 1 },
+          "locator": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "value"],
+            "properties": {
+              "kind": { "enum": ["transcript-segment", "summary-fragment", "notes-fragment", "provider-reference"] },
+              "value": { "type": "string", "minLength": 1 }
+            }
+          },
+          "excerpt": { "type": "string", "minLength": 1 },
+          "content_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+        }
+      }
+    },
+    "unknowns": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "sensitivity": { "enum": ["public", "internal", "confidential", "restricted"] },
+    "extensions": { "type": "object", "additionalProperties": true }
+  },
+  "anyOf": [
+    { "properties": { "notes_markdown": { "type": "string" } }, "required": ["notes_markdown"] },
+    { "properties": { "summary_markdown": { "type": "string" } }, "required": ["summary_markdown"] },
+    { "properties": { "transcript_segments": { "type": "array", "minItems": 1 } } }
+  ]
+}

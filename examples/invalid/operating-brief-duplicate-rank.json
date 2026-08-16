@@ -1,0 +1,58 @@
+{
+  "schema_version": "v1",
+  "brief_id": "brief-founder-2026-08-15",
+  "actor": "Founder",
+  "generated_at": "2026-08-15T17:30:00Z",
+  "window": { "start": "2026-08-14T17:30:00Z", "end": "2026-08-15T17:30:00Z" },
+  "headline": "Two priorities were assigned the same rank.",
+  "evidence_bundle_id": "bundle-founder-2026-08-15",
+  "priorities": [
+    {
+      "priority_id": "priority-one",
+      "rank": 1,
+      "title": "First",
+      "recommendation": "Do the first task.",
+      "why_now": "It is urgent.",
+      "evidence_for": ["evidence-1"],
+      "evidence_against": [],
+      "confidence": "medium",
+      "success_signal": "The first task is complete.",
+      "next_action": {
+        "schema_version": "v1",
+        "action_id": "action-one",
+        "decision_id": "priority-one",
+        "action_type": "draft",
+        "destination": "manual",
+        "payload_preview": {},
+        "rationale_evidence_ids": ["evidence-1"],
+        "approval": { "required": false, "state": "not-required" },
+        "status": "ready"
+      }
+    },
+    {
+      "priority_id": "priority-two",
+      "rank": 1,
+      "title": "Second",
+      "recommendation": "Do the second task.",
+      "why_now": "It is also urgent.",
+      "evidence_for": ["evidence-2"],
+      "evidence_against": [],
+      "confidence": "medium",
+      "success_signal": "The second task is complete.",
+      "next_action": {
+        "schema_version": "v1",
+        "action_id": "action-two",
+        "decision_id": "priority-two",
+        "action_type": "draft",
+        "destination": "manual",
+        "payload_preview": {},
+        "rationale_evidence_ids": ["evidence-2"],
+        "approval": { "required": false, "state": "not-required" },
+        "status": "ready"
+      }
+    }
+  ],
+  "watchlist": [],
+  "source_coverage": [],
+  "unknowns": []
+}

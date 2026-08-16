@@ -1,0 +1,77 @@
+{
+  "actor": "Founder",
+  "window": {
+    "start": "2026-08-14T17:30:00Z",
+    "end": "2026-08-15T17:30:00Z"
+  },
+  "expected_sources": ["granola", "gmail", "hubspot", "posthog"],
+  "focus": "Protect customer expansion and keep the product team focused.",
+  "evidence_bundle": {
+    "schema_version": "v1",
+    "bundle_id": "bundle-founder-harness-test",
+    "decision_id": "founder-daily-2026-08-15",
+    "generated_at": "2026-08-15T17:30:00Z",
+    "items": [
+      {
+        "evidence_id": "meeting-acme-expansion",
+        "source": "granola",
+        "source_family": "customer-conversation",
+        "subject": "Acme expansion",
+        "claim": "Acme tied a 40-seat expansion to getting scheduled exports this month.",
+        "stance": "supports",
+        "observed_at": "2026-08-15T16:30:00Z",
+        "confidence": {
+          "level": "high",
+          "reason": "The requirement was stated directly by the customer."
+        },
+        "sensitivity": "confidential",
+        "raw_reference": {
+          "kind": "record",
+          "value": "granola:note:not_test"
+        }
+      },
+      {
+        "evidence_id": "email-acme-security",
+        "source": "gmail",
+        "source_family": "customer-communication",
+        "subject": "Acme security review",
+        "claim": "Acme's security reviewer asked for an updated data-retention answer by Monday.",
+        "stance": "supports",
+        "observed_at": "2026-08-15T15:00:00Z",
+        "confidence": {
+          "level": "high",
+          "reason": "The deadline appears in the customer email."
+        },
+        "sensitivity": "confidential",
+        "raw_reference": {
+          "kind": "message",
+          "value": "gmail:thread:test"
+        }
+      },
+      {
+        "evidence_id": "analytics-export-usage",
+        "source": "posthog",
+        "source_family": "product-analytics",
+        "subject": "export adoption",
+        "claim": "Only two active accounts used manual exports more than once this week.",
+        "stance": "opposes",
+        "observed_at": "2026-08-15T14:00:00Z",
+        "confidence": {
+          "level": "medium",
+          "reason": "The event query is fresh but excludes failed export attempts."
+        },
+        "sensitivity": "internal",
+        "raw_reference": {
+          "kind": "adapter-response",
+          "value": "posthog:query:test"
+        }
+      }
+    ],
+    "degraded_sources": [
+      {
+        "source": "hubspot",
+        "reason": "The CRM adapter is not installed."
+      }
+    ]
+  }
+}

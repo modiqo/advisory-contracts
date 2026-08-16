@@ -1,12 +1,13 @@
 {
   "name": "@modiqo/advisory-contracts",
-  "contract_version": "0.2.0",
+  "contract_version": "0.3.0",
   "schema_version": "v1",
   "draft": "https://json-schema.org/draft/2020-12/schema",
   "schemas": [
     { "name": "content-source", "path": "schemas/v1/content-source.schema.json" },
     { "name": "landing-page-snapshot", "path": "schemas/v1/landing-page-snapshot.schema.json" },
     { "name": "pricing-page-snapshot", "path": "schemas/v1/pricing-page-snapshot.schema.json" },
+    { "name": "conversation-artifact", "path": "schemas/v1/conversation-artifact.schema.json" },
     { "name": "decision-context", "path": "schemas/v1/decision-context.schema.json" },
     { "name": "source-spec", "path": "schemas/v1/source-spec.schema.json" },
     { "name": "evidence-item", "path": "schemas/v1/evidence-item.schema.json" },
@@ -14,6 +15,7 @@
     { "name": "advisory-rubric", "path": "schemas/v1/advisory-rubric.schema.json" },
     { "name": "action-intent", "path": "schemas/v1/action-intent.schema.json" },
     { "name": "decision", "path": "schemas/v1/decision.schema.json" },
+    { "name": "operating-brief", "path": "schemas/v1/operating-brief.schema.json" },
     { "name": "module-manifest", "path": "schemas/v1/module-manifest.schema.json" },
     { "name": "run-manifest", "path": "schemas/v1/run-manifest.schema.json" }
   ]

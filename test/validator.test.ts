@@ -153,6 +153,54 @@ test("rejects dangling evidence and pricing plan references", () => {
   );
 });
 
+test("accepts provider-neutral conversation artifacts", () => {
+  const conversation = JSON.parse(
+    readFileSync("examples/valid/conversation-artifact.json", "utf8"),
+  );
+  assert.equal(
+    validator.validate("conversation-artifact", conversation).valid,
+    true,
+  );
+});
+
+test("rejects conversation findings with missing evidence", () => {
+  const conversation = JSON.parse(
+    readFileSync(
+      "examples/invalid/conversation-artifact-missing-evidence.json",
+      "utf8",
+    ),
+  );
+  const result = validator.validate("conversation-artifact", conversation);
+  assert.equal(result.valid, false);
+  assert.ok(
+    result.errors.some((error) =>
+      error.keyword === "contractReference" &&
+      error.instancePath === "/identified_decisions/0/evidence_refs/0"
+    ),
+  );
+});
+
+test("accepts compact operating briefs and rejects ambiguous ranks", () => {
+  const valid = JSON.parse(
+    readFileSync("examples/valid/operating-brief.json", "utf8"),
+  );
+  const invalid = JSON.parse(
+    readFileSync(
+      "examples/invalid/operating-brief-duplicate-rank.json",
+      "utf8",
+    ),
+  );
+  assert.equal(validator.validate("operating-brief", valid).valid, true);
+  const invalidResult = validator.validate("operating-brief", invalid);
+  assert.equal(invalidResult.valid, false);
+  assert.ok(
+    invalidResult.errors.some((error) =>
+      error.keyword === "contractReference" &&
+      error.instancePath === "/priorities/1/rank"
+    ),
+  );
+});
+
 test("requires URI snapshots to come from a rendered rote browse capture", () => {
   const landing = JSON.parse(
     readFileSync("examples/valid/landing-page-snapshot-uri.json", "utf8"),
@@ -213,5 +261,24 @@ test("landing assessment uses a bounded one-shot fast reasoning path", () => {
     harness,
     /--output-schema|--json-schema|priorOutput|repairErrors/,
   );
+  assert.doesNotMatch(harness, /for \(let attempt/);
+});
+
+test("founder daily brief uses private file input and a bounded one-shot reasoning path", () => {
+  const harness = readFileSync(
+    "scripts/founder-daily-brief-agent-harness.ts",
+    "utf8",
+  );
+  assert.match(harness, /const REASONING_TIMEOUT_MS = 27_000/);
+  assert.match(harness, /const MAX_EVIDENCE_CHARS = 6_000/);
+  assert.match(harness, /const MAX_RUBRIC_CHARS = 1_200/);
+  assert.match(harness, /--input-file/);
+  assert.match(
+    harness,
+    /type ReasoningAgent = "codex" \| "claude" \| "kimi" \| "pi" \| "hermes"/,
+  );
+  assert.match(harness, /model_reasoning_effort/);
+  assert.match(harness, /settings\.provider \? \["--provider"/);
+  assert.match(harness, /approval: \{ required: true, state: "proposed" \}/);
   assert.doesNotMatch(harness, /for \(let attempt/);
 });

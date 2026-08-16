@@ -68,14 +68,16 @@ function checkEvidenceReferences(value: unknown, evidenceIds: Set<string>, path:
   }
 }
 
-function validateSnapshotReferences(schemaName: string, value: unknown): ErrorObject[] {
-  if (schemaName !== "landing-page-snapshot" && schemaName !== "pricing-page-snapshot") return [];
+function validateSemanticReferences(schemaName: string, value: unknown): ErrorObject[] {
+  if (!["landing-page-snapshot", "pricing-page-snapshot", "conversation-artifact", "operating-brief"].includes(schemaName)) return [];
   if (!value || typeof value !== "object" || Array.isArray(value)) return [];
 
   const record = value as Record<string, unknown>;
   const errors: ErrorObject[] = [];
-  const evidenceIds = recordIds(record, "evidence", "evidence_id", errors);
-  checkEvidenceReferences(record, evidenceIds, "", errors);
+  if (schemaName !== "operating-brief") {
+    const evidenceIds = recordIds(record, "evidence", "evidence_id", errors);
+    checkEvidenceReferences(record, evidenceIds, "", errors);
+  }
 
   if (schemaName === "pricing-page-snapshot") {
     const planIds = recordIds(record, "plans", "plan_id", errors);
@@ -88,6 +90,52 @@ function validateSnapshotReferences(schemaName: string, value: unknown): ErrorOb
           errors.push(semanticError(`/calls_to_action/${index}/plan_id`, `references missing plan_id '${planId}'`, { missing: planId }));
         }
       });
+    }
+  }
+
+  if (schemaName === "conversation-artifact") {
+    const segmentIds = recordIds(record, "transcript_segments", "segment_id", errors);
+    recordIds(record, "identified_decisions", "item_id", errors);
+    recordIds(record, "action_items", "item_id", errors);
+    const evidence = record.evidence;
+    if (Array.isArray(evidence)) {
+      evidence.forEach((item, index) => {
+        if (!item || typeof item !== "object") return;
+        const locator = (item as Record<string, unknown>).locator;
+        if (!locator || typeof locator !== "object" || Array.isArray(locator)) return;
+        const locatorRecord = locator as Record<string, unknown>;
+        if (locatorRecord.kind === "transcript-segment" && typeof locatorRecord.value === "string" && !segmentIds.has(locatorRecord.value)) {
+          errors.push(semanticError(`/evidence/${index}/locator/value`, `references missing segment_id '${locatorRecord.value}'`, { missing: locatorRecord.value }));
+        }
+      });
+    }
+  }
+
+  if (schemaName === "operating-brief") {
+    recordIds(record, "priorities", "priority_id", errors);
+    const priorities = record.priorities;
+    if (Array.isArray(priorities)) {
+      const ranks = new Set<number>();
+      priorities.forEach((item, index) => {
+        if (!item || typeof item !== "object") return;
+        const priority = item as Record<string, unknown>;
+        const rank = priority.rank;
+        if (typeof rank === "number") {
+          if (ranks.has(rank)) errors.push(semanticError(`/priorities/${index}/rank`, `must be unique; duplicate '${rank}'`, { duplicate: rank }));
+          ranks.add(rank);
+        }
+        const nextAction = priority.next_action;
+        if (nextAction && typeof nextAction === "object" && !Array.isArray(nextAction)) {
+          const actionDecisionId = (nextAction as Record<string, unknown>).decision_id;
+          const priorityId = priority.priority_id;
+          if (typeof actionDecisionId === "string" && typeof priorityId === "string" && actionDecisionId !== priorityId) {
+            errors.push(semanticError(`/priorities/${index}/next_action/decision_id`, `must match priority_id '${priorityId}'`, { expected: priorityId }));
+          }
+        }
+      });
+      for (let expected = 1; expected <= priorities.length; expected += 1) {
+        if (!ranks.has(expected)) errors.push(semanticError("/priorities", `ranks must be contiguous from 1; missing '${expected}'`, { missing: expected }));
+      }
     }
   }
 
@@ -124,7 +172,7 @@ export class ContractValidator {
     if (!validator) throw new Error(`Unknown advisory contract: ${schemaName}`);
     const schemaValid = validator(value);
     const errors = validator.errors ? [...validator.errors] : [];
-    if (schemaValid) errors.push(...validateSnapshotReferences(schemaName, value));
+    if (schemaValid) errors.push(...validateSemanticReferences(schemaName, value));
     return { valid: Boolean(schemaValid) && errors.length === 0, errors };
   }
 

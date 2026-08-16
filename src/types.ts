@@ -161,6 +161,59 @@ export interface PricingPageSnapshot {
   extensions?: Record<string, unknown>;
 }
 
+export interface ConversationParticipant {
+  participant_id?: string;
+  display_name: string;
+  email?: string;
+  role?: "internal" | "customer" | "prospect" | "partner" | "investor" | "candidate" | "unknown";
+}
+
+export interface ConversationArtifact {
+  schema_version: SchemaVersion;
+  artifact_id: string;
+  source: {
+    provider: string;
+    source_id: string;
+    captured_at: string;
+    raw_reference: {
+      kind: "url" | "adapter-response" | "file" | "record" | "manual";
+      value: string;
+      content_hash?: string;
+    };
+  };
+  title: string;
+  started_at: string;
+  ended_at?: string;
+  participants: ConversationParticipant[];
+  notes_markdown?: string;
+  summary_markdown?: string;
+  transcript_segments: Array<{
+    segment_id: string;
+    speaker?: { participant_id?: string; display_name?: string; provider_label?: string };
+    start_seconds?: number;
+    end_seconds?: number;
+    text: string;
+  }>;
+  identified_decisions: Array<{ item_id: string; statement: string; owner?: string; evidence_refs: string[] }>;
+  action_items: Array<{
+    item_id: string;
+    description: string;
+    owner?: string;
+    due_at?: string;
+    status: "open" | "done" | "unknown";
+    evidence_refs: string[];
+  }>;
+  evidence: Array<{
+    evidence_id: string;
+    locator: { kind: "transcript-segment" | "summary-fragment" | "notes-fragment" | "provider-reference"; value: string };
+    excerpt: string;
+    content_hash?: string;
+  }>;
+  unknowns: string[];
+  sensitivity: Sensitivity;
+  extensions?: Record<string, unknown>;
+}
+
 export interface DecisionContext {
   schema_version: SchemaVersion;
   decision_id: string;
@@ -266,5 +319,37 @@ export interface Decision {
   success_threshold: string;
   kill_criteria: string[];
   actions: ActionIntent[];
+  extensions?: Record<string, unknown>;
+}
+
+export interface OperatingBrief {
+  schema_version: SchemaVersion;
+  brief_id: string;
+  actor: string;
+  generated_at: string;
+  window: { start: string; end: string };
+  headline: string;
+  evidence_bundle_id: string;
+  priorities: Array<{
+    priority_id: string;
+    rank: 1 | 2 | 3;
+    title: string;
+    recommendation: string;
+    why_now: string;
+    evidence_for: string[];
+    evidence_against: string[];
+    confidence: Confidence;
+    success_signal: string;
+    decision_deadline?: string;
+    next_action: ActionIntent;
+  }>;
+  watchlist: Array<{ signal: string; why_it_matters: string; evidence_refs: string[] }>;
+  source_coverage: Array<{
+    source: string;
+    status: "fresh" | "degraded" | "missing";
+    detail: string;
+    last_observed_at?: string;
+  }>;
+  unknowns: string[];
   extensions?: Record<string, unknown>;
 }
