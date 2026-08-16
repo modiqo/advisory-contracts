@@ -284,9 +284,11 @@ function parseArgs(values: string[]): {
     );
   }
   const rawModel = (named.get("model") ?? "default").trim();
-  const model = rawModel === "" || rawModel.toLowerCase() === "default"
+  const requestedModel = rawModel === "" || rawModel.toLowerCase() === "default"
     ? null
     : rawModel;
+  const model = requestedModel ??
+    (candidate === "kimi" ? "kimi-code/kimi-for-coding-highspeed" : null);
   if (model && !/^[A-Za-z0-9._:/-]{1,160}$/.test(model)) {
     throw new Error("invalid model identifier");
   }

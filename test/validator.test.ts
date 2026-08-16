@@ -208,6 +208,7 @@ test("landing assessment uses a bounded one-shot fast reasoning path", () => {
   assert.match(harness, /settings\.provider \? \["--provider"/);
   assert.match(harness, /compactPageEvidence/);
   assert.match(harness, /snapshotFromFacts/);
+  assert.match(harness, /kimi-code\/kimi-for-coding-highspeed/);
   assert.doesNotMatch(
     harness,
     /--output-schema|--json-schema|priorOutput|repairErrors/,
