@@ -325,6 +325,8 @@ test("founder sales follow-up uses private evidence and approval-only proposed a
   assert.match(harness, /approval: \{ required: true, state: "proposed" \}/);
   assert.match(harness, /"create-email-draft"/);
   assert.match(harness, /boundAgentCollections/);
+  assert.match(harness, /effort === "none" && candidate !== "codex"/);
+  assert.match(harness, /codex: "gpt-5\.6-luna"/);
   assert.doesNotMatch(harness, /"send-email"/);
   assert.doesNotMatch(harness, /for \(let attempt/);
 });

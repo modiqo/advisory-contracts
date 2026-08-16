@@ -114,6 +114,11 @@ The model may draft an email and propose CRM changes or internal tasks, but the
 harness constructs every downstream `ActionIntent` with approval required and
 status `proposed`. It never sends mail, updates a CRM, or creates a task.
 
+The default low-latency configuration is selected per runner: GPT-5.6 Luna
+with no reasoning for Codex, the authenticated Claude default with low effort,
+and Kimi Coding Highspeed for Kimi. Callers can override both model and effort; unsupported
+runner/effort combinations fail explicitly rather than falling back.
+
 Published Plays should run a typed Crucible `sales_and_commercial` /
 `enterprise-readiness` step first, then invoke a commit-pinned harness URL with
 `rote deno`. The optional `--rubric` argument is only for isolated development.

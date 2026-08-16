@@ -9,7 +9,7 @@ import evidenceItemSchema from "../schemas/v1/evidence-item.schema.json" with { 
 import salesFollowUpPackageSchema from "../schemas/v1/sales-follow-up-package.schema.json" with { type: "json" };
 
 type ReasoningAgent = "codex" | "claude" | "kimi" | "pi" | "hermes";
-type ReasoningEffort = "low" | "medium" | "high";
+type ReasoningEffort = "none" | "low" | "medium" | "high";
 type EvidenceReference = { evidence_id: string; excerpt: string };
 type ConversationArtifact = {
   artifact_id: string;
@@ -125,14 +125,22 @@ function parseArgs(values: string[]): { inputFile: string; agent: ReasoningAgent
   if (!("codex,claude,kimi,pi,hermes".split(",")).includes(candidate)) throw new Error(`reasoning agent must be one of codex, claude, kimi, pi, or hermes; received ${candidate}`);
   const rawModel = (named.get("model") ?? "default").trim();
   const requestedModel = rawModel === "" || rawModel.toLowerCase() === "default" ? null : rawModel;
-  const model = requestedModel ?? (candidate === "kimi" ? "kimi-code/kimi-for-coding-highspeed" : null);
+  const defaultModels: Partial<Record<ReasoningAgent, string>> = {
+    codex: "gpt-5.6-luna",
+    kimi: "kimi-code/kimi-for-coding-highspeed",
+  };
+  const model = requestedModel ?? defaultModels[candidate as ReasoningAgent] ?? null;
   if (model && !/^[A-Za-z0-9._:/-]{1,160}$/.test(model)) throw new Error("invalid model identifier");
   const rawProvider = (named.get("provider") ?? "default").trim();
   const provider = rawProvider === "" || rawProvider.toLowerCase() === "default" ? null : rawProvider;
   if (provider && !/^[A-Za-z0-9._-]{1,80}$/.test(provider)) throw new Error("invalid provider identifier");
   if (provider && candidate !== "hermes") throw new Error("custom provider selection is supported only by the hermes runner");
-  const effort = (named.get("effort") ?? "low").toLowerCase();
-  if (!("low,medium,high".split(",")).includes(effort)) throw new Error(`reasoning effort must be low, medium, or high; received ${effort}`);
+  const requestedEffort = (named.get("effort") ?? "auto").toLowerCase();
+  if (!("auto,none,low,medium,high".split(",")).includes(requestedEffort)) throw new Error(`reasoning effort must be auto, none, low, medium, or high; received ${requestedEffort}`);
+  const effort = requestedEffort === "auto"
+    ? (candidate === "codex" ? "none" : "low")
+    : requestedEffort;
+  if (effort === "none" && candidate !== "codex") throw new Error("reasoning effort none is supported only by the codex runner");
   if (candidate === "pi" && model) throw new Error("custom model selection is not supported by the pi harness");
   return { inputFile, agent: candidate as ReasoningAgent, rubric: named.get("rubric"), settings: { model, provider, effort: effort as ReasoningEffort } };
 }
