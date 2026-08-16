@@ -728,11 +728,13 @@ function normalizeBoundedLists(value: unknown): unknown {
       promise: 180,
     };
     for (const [key, max] of Object.entries(factLimits)) {
-      if (typeof facts[key] === "string") facts[key] = facts[key].slice(0, max);
+      if (typeof facts[key] === "string") {
+        facts[key] = clipText(facts[key], max);
+      }
     }
     if (facts.primary_cta && typeof facts.primary_cta === "object") {
       const cta = facts.primary_cta as Record<string, unknown>;
-      if (typeof cta.label === "string") cta.label = cta.label.slice(0, 100);
+      if (typeof cta.label === "string") cta.label = clipText(cta.label, 100);
       if (typeof cta.evidence_ref === "string") {
         cta.evidence_ref = cta.evidence_ref.slice(0, 40);
       }
@@ -743,10 +745,10 @@ function normalizeBoundedLists(value: unknown): unknown {
         if (!item || typeof item !== "object") continue;
         const section = item as Record<string, unknown>;
         if (typeof section.heading === "string") {
-          section.heading = section.heading.slice(0, 120);
+          section.heading = clipText(section.heading, 120);
         }
         if (typeof section.summary === "string") {
-          section.summary = section.summary.slice(0, 180);
+          section.summary = clipText(section.summary, 180);
         }
         if (typeof section.evidence_ref === "string") {
           section.evidence_ref = section.evidence_ref.slice(0, 40);
@@ -759,10 +761,10 @@ function normalizeBoundedLists(value: unknown): unknown {
         if (!item || typeof item !== "object") continue;
         const proof = item as Record<string, unknown>;
         if (typeof proof.claim === "string") {
-          proof.claim = proof.claim.slice(0, 180);
+          proof.claim = clipText(proof.claim, 180);
         }
         if (typeof proof.attribution === "string") {
-          proof.attribution = proof.attribution.slice(0, 120);
+          proof.attribution = clipText(proof.attribution, 120);
         }
         if (typeof proof.evidence_ref === "string") {
           proof.evidence_ref = proof.evidence_ref.slice(0, 40);
@@ -771,7 +773,7 @@ function normalizeBoundedLists(value: unknown): unknown {
     }
     if (Array.isArray(facts.unknowns)) {
       facts.unknowns = facts.unknowns.slice(0, 4).map((item) =>
-        typeof item === "string" ? item.slice(0, 140) : item
+        typeof item === "string" ? clipText(item, 140) : item
       );
     }
   }
@@ -781,26 +783,26 @@ function normalizeBoundedLists(value: unknown): unknown {
   ) {
     const assessment = envelope.assessment as Record<string, unknown>;
     if (typeof assessment.verdict === "string") {
-      assessment.verdict = assessment.verdict.slice(0, 160);
+      assessment.verdict = clipText(assessment.verdict, 160);
     }
     if (typeof assessment.summary === "string") {
-      assessment.summary = assessment.summary.slice(0, 300);
+      assessment.summary = clipText(assessment.summary, 300);
     }
     if (Array.isArray(assessment.top_changes)) {
       assessment.top_changes = assessment.top_changes.slice(0, 3).map((item) =>
-        typeof item === "string" ? item.slice(0, 180) : item
+        typeof item === "string" ? clipText(item, 180) : item
       );
     }
     if (assessment.rewrite && typeof assessment.rewrite === "object") {
       const rewrite = assessment.rewrite as Record<string, unknown>;
       if (typeof rewrite.headline === "string") {
-        rewrite.headline = rewrite.headline.slice(0, 160);
+        rewrite.headline = clipText(rewrite.headline, 160);
       }
       if (typeof rewrite.subheadline === "string") {
-        rewrite.subheadline = rewrite.subheadline.slice(0, 260);
+        rewrite.subheadline = clipText(rewrite.subheadline, 260);
       }
       if (typeof rewrite.primary_cta === "string") {
-        rewrite.primary_cta = rewrite.primary_cta.slice(0, 100);
+        rewrite.primary_cta = clipText(rewrite.primary_cta, 100);
       }
     }
     if (typeof assessment.experiment === "string") {
@@ -808,12 +810,12 @@ function normalizeBoundedLists(value: unknown): unknown {
     }
     if (Array.isArray(assessment.risks)) {
       assessment.risks = assessment.risks.slice(0, 2).map((item) =>
-        typeof item === "string" ? item.slice(0, 140) : item
+        typeof item === "string" ? clipText(item, 140) : item
       );
     }
     if (Array.isArray(assessment.unknowns)) {
       assessment.unknowns = assessment.unknowns.slice(0, 3).map((item) =>
-        typeof item === "string" ? item.slice(0, 140) : item
+        typeof item === "string" ? clipText(item, 140) : item
       );
     }
   }
