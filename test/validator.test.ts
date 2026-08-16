@@ -195,3 +195,22 @@ test("pricing assessment uses a bounded one-shot fast reasoning path", () => {
   );
   assert.doesNotMatch(harness, /for \(let attempt/);
 });
+
+test("landing assessment uses a bounded one-shot fast reasoning path", () => {
+  const harness = readFileSync("scripts/landing-page-agent-harness.ts", "utf8");
+  assert.match(harness, /const REASONING_TIMEOUT_MS = 27_000/);
+  assert.match(harness, /const MAX_RUBRIC_CHARS = 1_200/);
+  assert.match(
+    harness,
+    /type ReasoningAgent = "codex" \| "claude" \| "kimi" \| "pi" \| "hermes"/,
+  );
+  assert.match(harness, /model_reasoning_effort/);
+  assert.match(harness, /settings\.provider \? \["--provider"/);
+  assert.match(harness, /compactPageEvidence/);
+  assert.match(harness, /snapshotFromFacts/);
+  assert.doesNotMatch(
+    harness,
+    /--output-schema|--json-schema|priorOutput|repairErrors/,
+  );
+  assert.doesNotMatch(harness, /for \(let attempt/);
+});
